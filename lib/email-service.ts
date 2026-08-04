@@ -13,6 +13,7 @@ async function sendViaResendHttpApi(
   }
 
   try {
+    const resendFrom = process.env.RESEND_FROM || 'NOEL VISUALS <onboarding@resend.dev>';
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -20,7 +21,7 @@ async function sendViaResendHttpApi(
         Authorization: `Bearer ${apiKey.trim()}`,
       },
       body: JSON.stringify({
-        from: from || 'NOEL VISUALS <onboarding@resend.dev>',
+        from: resendFrom,
         to: [to],
         subject,
         html,
