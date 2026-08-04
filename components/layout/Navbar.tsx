@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { SITE_CONFIG } from '@/constants/site';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
-import { ArrowRight, Menu, X, LogIn, ShieldAlert, LogOut, LayoutDashboard, ShieldCheck, UserPlus } from 'lucide-react';
+import { ArrowRight, Menu, X, LogIn, ShieldAlert, LogOut, LayoutDashboard, ShieldCheck, UserPlus, User } from 'lucide-react';
 import { MobileMenu } from './MobileMenu';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/components/providers/AuthProvider';
@@ -90,7 +90,7 @@ export const Navbar = () => {
                 className="text-amber-400 font-bold hover:text-amber-300 flex items-center gap-1.5 bg-amber-400/10 px-2.5 py-1 rounded-md border border-amber-400/30"
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
-                ADMIN
+                ADMIN DASHBOARD
               </Link>
             )}
           </nav>
@@ -105,11 +105,11 @@ export const Navbar = () => {
                   className="flex items-center gap-2.5 p-1.5 pr-3 rounded-full bg-white/10 border border-white/20 hover:border-white/40 transition-all text-xs font-mono"
                 >
                   <img
-                    src={user.avatar}
-                    alt={user.username}
+                    src={user.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}
+                    alt={user.username || 'User'}
                     className="w-6 h-6 rounded-full object-cover"
                   />
-                  <span className="text-white font-semibold">{user.username}</span>
+                  <span className="text-white font-semibold">@{user.username || 'User'}</span>
                   {user.isAdmin && (
                     <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
                   )}
@@ -125,24 +125,26 @@ export const Navbar = () => {
                     >
                       <div className="p-2.5 rounded-lg bg-white/5 space-y-1">
                         <div className="font-bold text-white flex items-center justify-between">
-                          <span>{user.username}</span>
-                          <span className="text-[10px] font-mono text-emerald-400">Verified ✓</span>
+                          <span>@{user.username || 'User'}</span>
+                          <span className="text-[10px] font-mono text-emerald-400">Verifiziert ✓</span>
                         </div>
-                        <p className="text-[10px] font-mono text-neutral-400 truncate">
-                          {user.email}
-                        </p>
+                        {user.email && (
+                          <p className="text-[10px] font-mono text-neutral-400 truncate">
+                            {user.email}
+                          </p>
+                        )}
 
                         {/* Role status */}
                         <div className="pt-2 flex items-center gap-1.5 text-[10px] font-mono">
                           {user.isAdmin ? (
                             <span className="text-amber-400 flex items-center gap-1 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                              <ShieldCheck className="w-3 h-3" />
-                              Role 1533100816783638729 Verified
+                              <ShieldCheck className="w-3 h-3 text-amber-400" />
+                              Staff / Admin Status Verifiziert
                             </span>
                           ) : (
-                            <span className="text-neutral-400 flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded">
-                              <ShieldAlert className="w-3 h-3 text-neutral-500" />
-                              Member (No Admin Role)
+                            <span className="text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                              <User className="w-3 h-3 text-emerald-400" />
+                              Kunden-Account Verifiziert
                             </span>
                           )}
                         </div>
@@ -167,7 +169,7 @@ export const Navbar = () => {
                         className="w-full flex items-center gap-2 p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-white/5 transition-colors text-left"
                       >
                         <LogOut className="w-4 h-4" />
-                        <span>Sign Out</span>
+                        <span>Abmelden</span>
                       </button>
                     </motion.div>
                   )}

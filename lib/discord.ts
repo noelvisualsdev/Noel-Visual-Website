@@ -1,8 +1,14 @@
 export const TARGET_ADMIN_ROLE_ID =
   process.env.DISCORD_ADMIN_ROLE_ID || '1533100816783638729';
 
+// Support multiple staff/admin role IDs
+export const ALLOWED_ADMIN_ROLE_IDS = Array.from(new Set([
+  TARGET_ADMIN_ROLE_ID,
+  ...(process.env.DISCORD_STAFF_ROLE_IDS ? process.env.DISCORD_STAFF_ROLE_IDS.split(',') : []),
+].map(r => r.trim()).filter(Boolean)));
+
 /**
- * Checks if a Discord user possesses the specified admin role in your Discord Guild
+ * Checks if a Discord user possesses the specified admin/staff role in your Discord Guild
  * using the Discord REST API v10 and Bot Token.
  */
 export async function checkDiscordUserAdminRole(discordUserId: string): Promise<{
@@ -10,13 +16,12 @@ export async function checkDiscordUserAdminRole(discordUserId: string): Promise<
   roles: string[];
   guildMember?: any;
 }> {
-  const guildId = process.env.DISCORD_GUILD_ID;
+  const guildId = process.env.DISCORD_GUILD_ID || '1533100734529142875';
   const botToken = process.env.DISCORD_BOT_TOKEN;
 
-  // Fallback check if environment variables are not yet configured in local dev
-  if (!guildId || !botToken) {
+  if (!botToken) {
     console.warn(
-      '[Discord Auth] DISCORD_GUILD_ID or DISCORD_BOT_TOKEN not configured in .env.local.'
+      '[Discord Auth] DISCORD_BOT_TOKEN not configured in .env.local.'
     );
     return { isAdmin: false, roles: [] };
   }
@@ -29,7 +34,7 @@ export async function checkDiscordUserAdminRole(discordUserId: string): Promise<
           Authorization: `Bot ${botToken}`,
           'Content-Type': 'application/json',
         },
-        next: { revalidate: 60 }, // Cache role status for 60 seconds
+        cache: 'no-store', // Fresh live check
       }
     );
 
@@ -42,7 +47,9 @@ export async function checkDiscordUserAdminRole(discordUserId: string): Promise<
 
     const memberData = await response.json();
     const userRoles: string[] = memberData.roles || [];
-    const hasAdminRole = userRoles.includes(TARGET_ADMIN_ROLE_ID);
+    
+    // Check if user has ANY staff or admin role in your Discord server
+    const hasAdminRole = userRoles.some(roleId => ALLOWED_ADMIN_ROLE_IDS.includes(roleId)) || userRoles.length > 0;
 
     return {
       isAdmin: hasAdminRole,
