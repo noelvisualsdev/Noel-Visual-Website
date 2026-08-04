@@ -282,7 +282,7 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
               <tr>
                 <td align="left" style="border-top: 1px solid #f3f4f6; padding-top: 24px;">
                   <p style="margin: 0; color: #6b7280; font-size: 13px; line-height: 1.6;">
-                    If you have any questions regarding this order inquiry, feel free to reply directly to this email.
+                    If you have any questions regarding this order inquiry, feel free to reply directly to this email. Or open up a Ticket on the Discord Server discord.gg/noelvisuals
                   </p>
                   <p style="margin: 16px 0 0 0; color: #111827; font-size: 14px; font-weight: 700;">
                     Thanks,<br/>The Noel Visuals Team
