@@ -30,6 +30,9 @@ async function sendViaResendHttpApi(
     if (res.ok) {
       console.log(`[Resend HTTP API Success] Sent email to ${to}`);
       return true;
+    } else {
+      const errJson = await res.json().catch(() => ({}));
+      console.error(`[Resend HTTP API Rejected ${res.status}]:`, JSON.stringify(errJson));
     }
   } catch (err: any) {
     console.warn('[Resend HTTP API Warning]:', err.message);
