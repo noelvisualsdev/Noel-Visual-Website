@@ -23,20 +23,13 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  // Linked Discord State
-  const [discordUser, setDiscordUser] = useState({
-    id: '1208827674185957447',
-    username: 'yn5e',
-    avatar: 'https://cdn.discordapp.com/embed/avatars/0.png',
-  });
 
   // OTP Code State
   const [otpCode, setOtpCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const { loginWithDiscord } = useAuth();
+  const { user, loginWithDiscord } = useAuth();
 
   if (!isOpen) return null;
 
@@ -67,9 +60,9 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           username,
           email,
           password,
-          discordUserId: discordUser.id,
-          discordUsername: discordUser.username,
-          discordAvatar: discordUser.avatar,
+          discordUserId: user?.id || '',
+          discordUsername: user?.username || '',
+          discordAvatar: user?.avatar || '',
         }),
       });
 
@@ -270,24 +263,35 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           {/* CREATE ACCOUNT MODE */}
           {mode === 'register' && (
             <form onSubmit={handleRegister} className="space-y-4 relative z-10">
-              <div className="p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-500/30 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={discordUser.avatar}
-                    alt={discordUser.username}
-                    className="w-9 h-9 rounded-full border border-indigo-400/30"
-                  />
-                  <div>
-                    <span className="text-xs font-bold text-white uppercase block">
-                      DISCORD LINKED: @{discordUser.username}
-                    </span>
-                    <span className="text-[10px] font-mono text-indigo-300 block">
-                      ID: {discordUser.id} (Role Verified ✓)
-                    </span>
+              {user?.id ? (
+                <div className="p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-500/30 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={user.avatar || user.image || 'https://cdn.discordapp.com/embed/avatars/0.png'}
+                      alt={user.username || 'Discord User'}
+                      className="w-9 h-9 rounded-full border border-indigo-400/30 object-cover"
+                    />
+                    <div>
+                      <span className="text-xs font-bold text-white uppercase block">
+                        DISCORD LINKED: @{user.username || user.name || 'User'}
+                      </span>
+                      <span className="text-[10px] font-mono text-indigo-300 block">
+                        ID: {user.id} (Verified ✓)
+                      </span>
+                    </div>
                   </div>
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
                 </div>
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-              </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => loginWithDiscord()}
+                  className="w-full p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/20 transition-all font-bold text-xs flex items-center justify-between"
+                >
+                  <span className="font-mono text-[11px] uppercase">OPTIONAL: LINK DISCORD ACCOUNT</span>
+                  <span className="bg-indigo-500 text-white text-[10px] px-2 py-0.5 rounded font-mono font-bold">CONNECT</span>
+                </button>
+              )}
 
               <div className="space-y-1.5">
                 <label className="text-xs font-mono uppercase text-neutral-300 block tracking-wider">Username *</label>

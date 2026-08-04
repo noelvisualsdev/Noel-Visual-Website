@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import { checkDiscordUserAdminRole, TARGET_ADMIN_ROLE_ID } from '@/lib/discord';
+import { recordUserSession } from '@/lib/sessions-db';
+
+const OWNER_DISCORD_ID = '1208827674185957447';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -15,18 +18,11 @@ export async function GET(request: Request) {
 
   if (!clientId || !clientSecret) {
     console.error('[Discord OAuth] DISCORD_CLIENT_SECRET is missing in .env.local');
-    // Fallback login so user is not blocked
-    return createLoggedSession(baseUrl, {
-      id: '1208827674185957447',
-      username: 'yn5e',
-      globalName: 'yn5e (Studio Admin)',
-      avatar: 'https://cdn.discordapp.com/embed/avatars/0.png',
-      email: 'admin@noelvisuals.com',
-    });
+    return NextResponse.redirect(`${baseUrl}?error=missing_oauth_config`);
   }
 
   try {
-    // 1. Try Token Exchange with Basic Auth Header (Standard Discord RFC6749)
+    // 1. Token Exchange
     const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
     let tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
       method: 'POST',
@@ -41,7 +37,6 @@ export async function GET(request: Request) {
       }),
     });
 
-    // Fallback try with body params
     if (!tokenResponse.ok) {
       tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
         method: 'POST',
@@ -61,21 +56,13 @@ export async function GET(request: Request) {
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
       console.error('[Discord Token Exchange Error Response]:', errorText);
-      
-      // If client_secret in .env.local is incorrect, log in with admin privileges so user is not blocked
-      return createLoggedSession(baseUrl, {
-        id: '1208827674185957447',
-        username: 'yn5e',
-        globalName: 'yn5e (Studio Admin)',
-        avatar: 'https://cdn.discordapp.com/embed/avatars/0.png',
-        email: 'admin@noelvisuals.com',
-      });
+      return NextResponse.redirect(`${baseUrl}?error=token_exchange_failed`);
     }
 
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
-    // 2. Fetch User Profile (@me)
+    // 2. Fetch User Profile (@me) from Discord
     const userResponse = await fetch('https://discord.com/api/v10/users/@me', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -83,23 +70,20 @@ export async function GET(request: Request) {
     });
 
     if (!userResponse.ok) {
-      return createLoggedSession(baseUrl, {
-        id: '1208827674185957447',
-        username: 'yn5e',
-        globalName: 'yn5e (Studio Admin)',
-        avatar: 'https://cdn.discordapp.com/embed/avatars/0.png',
-        email: 'admin@noelvisuals.com',
-      });
+      return NextResponse.redirect(`${baseUrl}?error=fetch_user_failed`);
     }
 
     const discordUser = await userResponse.json();
 
-    let isAdmin = true;
-    let roles: string[] = [TARGET_ADMIN_ROLE_ID];
+    // 3. Strict Admin Verification: Only owner (1208827674185957447) or admin role has isAdmin = true
+    let isAdmin = discordUser.id === OWNER_DISCORD_ID;
+    let roles: string[] = [];
 
     if (process.env.DISCORD_BOT_TOKEN && process.env.DISCORD_GUILD_ID) {
       const roleResult = await checkDiscordUserAdminRole(discordUser.id);
-      isAdmin = roleResult.isAdmin || true;
+      if (roleResult.isAdmin) {
+        isAdmin = true;
+      }
       if (roleResult.roles.length > 0) {
         roles = roleResult.roles;
       }
@@ -108,6 +92,16 @@ export async function GET(request: Request) {
     const avatarUrl = discordUser.avatar
       ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
       : `https://cdn.discordapp.com/embed/avatars/0.png`;
+
+    // 4. Record real user session in MongoDB noelvisuals.user_sessions
+    await recordUserSession({
+      userId: discordUser.id,
+      username: discordUser.username || discordUser.global_name || 'Discord User',
+      email: discordUser.email || `${discordUser.username}@discord.gg`,
+      loginMethod: 'discord_oauth',
+      ipAddress: request.headers.get('x-forwarded-for') || '127.0.0.1',
+      userAgent: request.headers.get('user-agent') || 'Browser',
+    });
 
     return createLoggedSession(baseUrl, {
       id: discordUser.id,
@@ -120,25 +114,19 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error('[Discord OAuth Callback Exception]:', error);
-    return createLoggedSession(baseUrl, {
-      id: '1208827674185957447',
-      username: 'yn5e',
-      globalName: 'yn5e (Studio Admin)',
-      avatar: 'https://cdn.discordapp.com/embed/avatars/0.png',
-      email: 'admin@noelvisuals.com',
-    });
+    return NextResponse.redirect(`${baseUrl}?error=oauth_exception`);
   }
 }
 
 function createLoggedSession(baseUrl: string, userData: any) {
   const userSession = {
-    id: userData.id || '1208827674185957447',
-    username: userData.username || 'yn5e',
-    globalName: userData.globalName || userData.username || 'yn5e',
-    email: userData.email || 'admin@noelvisuals.com',
-    avatar: userData.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png',
-    roles: userData.roles || [TARGET_ADMIN_ROLE_ID],
-    isAdmin: userData.isAdmin ?? true,
+    id: userData.id,
+    username: userData.username,
+    globalName: userData.globalName || userData.username,
+    email: userData.email,
+    avatar: userData.avatar,
+    roles: userData.roles || [],
+    isAdmin: userData.isAdmin ?? false,
   };
 
   const response = NextResponse.redirect(`${baseUrl}/`);

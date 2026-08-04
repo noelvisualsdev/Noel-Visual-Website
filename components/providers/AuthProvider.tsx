@@ -9,6 +9,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 export const ADMIN_ROLE_ID =
   process.env.NEXT_PUBLIC_DISCORD_ADMIN_ROLE_ID || '1533100816783638729';
 
+const OWNER_DISCORD_ID = '1208827674185957447';
+
 export interface DiscordUser {
   id?: string;
   name?: string | null;
@@ -91,9 +93,9 @@ function AuthInternalProvider({ children }: { children: React.ReactNode }) {
   const isNextAuthAuthenticated = status === 'authenticated' && !!session?.user;
   const isAuthenticated = isNextAuthAuthenticated || !!localUser;
 
-  const user: DiscordUser | null = isNextAuthAuthenticated && session?.user
+  const nextAuthUser: DiscordUser | null = isNextAuthAuthenticated && session?.user
     ? {
-        id: (session.user as any).id || '1208827674185957447',
+        id: (session.user as any).id || (session.user as any).sub || `discord-${Date.now()}`,
         name: session.user.name,
         email: session.user.email,
         image: session.user.image,
@@ -103,23 +105,24 @@ function AuthInternalProvider({ children }: { children: React.ReactNode }) {
           (session.user as any).avatar ||
           session.user.image ||
           'https://cdn.discordapp.com/embed/avatars/0.png',
-        roles: (session.user as any).roles || [ADMIN_ROLE_ID],
-        isAdmin: (session.user as any).isAdmin ?? true,
+        roles: (session.user as any).roles || [],
+        isAdmin: (session.user as any).isAdmin ?? ((session.user as any).id === OWNER_DISCORD_ID),
       }
-    : localUser;
+    : null;
+
+  const user = nextAuthUser || localUser;
 
   const loginWithDiscord = () => {
-    // Trigger direct OAuth login route or show config modal
     window.location.href = '/api/auth/discord/login';
   };
 
   const handleInstantConnect = () => {
     const mockDiscordAdmin: DiscordUser = {
-      id: '1208827674185957447',
+      id: OWNER_DISCORD_ID,
       username: 'yn5e',
       globalName: 'yn5e (Studio Admin)',
       avatar: 'https://cdn.discordapp.com/embed/avatars/0.png',
-      email: 'admin@noelvisuals.com',
+      email: 'contact.noelvisuals@gmail.com',
       roles: [ADMIN_ROLE_ID, 'member', 'creator'],
       isAdmin: true,
     };
@@ -163,82 +166,12 @@ function AuthInternalProvider({ children }: { children: React.ReactNode }) {
           <div>
             <div className="font-bold text-white uppercase">Discord Auth Error: {urlError}</div>
             <p className="text-[11px] text-neutral-300">
-              Check DISCORD_CLIENT_SECRET & Redirect URI: <code className="text-amber-300">http://localhost:3000/api/auth/discord/callback</code>
+              Check DISCORD_CLIENT_SECRET & Redirect URI in Discord Developer Portal
             </p>
           </div>
           <button onClick={() => setUrlError(null)} className="ml-2 hover:text-white">✕</button>
         </div>
       )}
-
-      {/* Discord OAuth Config Modal */}
-      <AnimatePresence>
-        {showConfigModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-xl">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="glass-card max-w-lg w-full p-8 rounded-2xl border border-indigo-500/30 space-y-6 relative shadow-2xl"
-            >
-              <button
-                onClick={() => setShowConfigModal(false)}
-                className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center">
-                  <Key className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white uppercase tracking-tight">
-                    DISCORD OAUTH2 CONNECT
-                  </h3>
-                  <p className="text-xs font-mono text-neutral-400">
-                    Discord Application Credentials Setup
-                  </p>
-                </div>
-              </div>
-
-              <p className="text-xs text-neutral-300 leading-relaxed">
-                To connect real live Discord OAuth2 logins, paste your <strong>Discord Client ID</strong> into your <code className="text-indigo-300 font-mono bg-white/10 px-2 py-0.5 rounded">.env.local</code> file or click <strong>Instant Session Connect</strong> below:
-              </p>
-
-              <div className="p-4 rounded-xl bg-black/60 border border-white/10 space-y-2 text-xs font-mono">
-                <div className="text-neutral-400">Environment Variables to set in .env.local:</div>
-                <div className="text-emerald-400 overflow-x-auto p-2 rounded bg-black">
-                  DISCORD_CLIENT_ID=123456789012345678<br />
-                  DISCORD_CLIENT_SECRET=your_client_secret<br />
-                  DISCORD_ADMIN_ROLE_ID=1533100816783638729
-                </div>
-              </div>
-
-              <div className="space-y-3 pt-2">
-                <Button
-                  variant="glow"
-                  size="lg"
-                  onClick={handleInstantConnect}
-                  rightIcon={<ArrowRight className="w-4 h-4" />}
-                  className="w-full justify-center bg-indigo-500 text-white hover:bg-indigo-400 font-bold"
-                >
-                  INSTANT SESSION CONNECT (ROLE {ADMIN_ROLE_ID})
-                </Button>
-
-                <a
-                  href="https://discord.com/developers/applications"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center gap-2 w-full text-xs font-mono text-neutral-400 hover:text-white pt-2"
-                >
-                  <span>Open Discord Developer Portal</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </AuthContext.Provider>
   );
 }
