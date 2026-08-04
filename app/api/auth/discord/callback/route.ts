@@ -7,22 +7,24 @@ const OWNER_DISCORD_ID = '1208827674185957447';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
-  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-  const clientId = process.env.DISCORD_CLIENT_ID || process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID;
-  const clientSecret = process.env.DISCORD_CLIENT_SECRET;
-  const redirectUri = process.env.DISCORD_REDIRECT_URI || `${baseUrl}/api/auth/discord/callback`;
+  const baseUrl = (process.env.NEXTAUTH_URL || 'http://localhost:3000').trim().replace(/\/$/, '');
+  const clientId = (process.env.DISCORD_CLIENT_ID || process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '').trim();
+  const rawSecret = process.env.DISCORD_CLIENT_SECRET || '';
+  const clientSecret = rawSecret.trim().replace(/^["']|["']$/g, '');
+  
+  const redirectUri = (process.env.DISCORD_REDIRECT_URI || `${baseUrl}/api/auth/discord/callback`).trim();
 
   if (!code) {
     return NextResponse.redirect(`${baseUrl}?error=no_code`);
   }
 
   if (!clientId || !clientSecret) {
-    console.error('[Discord OAuth] DISCORD_CLIENT_SECRET is missing in .env.local');
+    console.error('[Discord OAuth Error]: DISCORD_CLIENT_SECRET is missing in .env.local');
     return NextResponse.redirect(`${baseUrl}?error=missing_oauth_config`);
   }
 
   try {
-    // 1. Token Exchange
+    // 1. Token Exchange with Discord API
     const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
     let tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
       method: 'POST',
@@ -55,7 +57,7 @@ export async function GET(request: Request) {
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
-      console.error('[Discord Token Exchange Error Response]:', errorText);
+      console.error(`[Discord Token Exchange Error] redirectUri: ${redirectUri} | Error:`, errorText);
       return NextResponse.redirect(`${baseUrl}?error=token_exchange_failed`);
     }
 
