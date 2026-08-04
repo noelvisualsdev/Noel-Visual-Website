@@ -7,14 +7,16 @@ const OWNER_DISCORD_ID = '1208827674185957447';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
-  const requestOrigin = new URL(request.url).origin;
-  const baseUrl = (process.env.NEXTAUTH_URL || requestOrigin).trim().replace(/\/$/, '');
+
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'noelvisuals.com';
+  const proto = request.headers.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
+  const baseUrl = (process.env.NEXTAUTH_URL || `${proto}://${host}`).trim().replace(/\/$/, '');
+
   const clientId = (process.env.DISCORD_CLIENT_ID || process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '').trim();
   const rawSecret = process.env.DISCORD_CLIENT_SECRET || '';
   const clientSecret = rawSecret.trim().replace(/^["']|["']$/g, '');
   
-  // Dynamically resolve redirect URI from request origin to match login route
-  const redirectUri = (process.env.DISCORD_REDIRECT_URI || `${requestOrigin}/api/auth/discord/callback`).trim();
+  const redirectUri = (process.env.DISCORD_REDIRECT_URI || `${baseUrl}/api/auth/discord/callback`).trim();
 
   if (!code) {
     return NextResponse.redirect(`${baseUrl}?error=no_code`);
