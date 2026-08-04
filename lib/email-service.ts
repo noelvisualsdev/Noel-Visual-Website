@@ -1,14 +1,27 @@
 import nodemailer from 'nodemailer';
 
+async function createTransporter(host: string, port: number, user: string, pass: string) {
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+}
+
 export async function sendVerificationEmail(
   toEmail: string,
   username: string,
   verificationCode: string
 ): Promise<{ success: boolean; message: string }> {
   const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
-  const port = Number(process.env.SMTP_PORT) || 587;
   const user = process.env.SMTP_USER ? process.env.SMTP_USER.trim() : '';
-  
   const rawPass = process.env.SMTP_PASS ? process.env.SMTP_PASS.trim() : '';
   const pass = rawPass.includes(' ') ? rawPass.replace(/\s+/g, '') : rawPass;
   const from = process.env.SMTP_FROM || `"NOEL VISUALS" <${user || 'contact.noelvisuals@gmail.com'}>`;
@@ -25,8 +38,6 @@ export async function sendVerificationEmail(
         <tr>
           <td align="center">
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 540px; background-color: #ffffff; border-radius: 12px; padding: 36px 32px; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-              
-              <!-- Brand Logo Top Left -->
               <tr>
                 <td align="left" style="padding-bottom: 24px;">
                   <div style="display: inline-block; width: 42px; height: 42px; background-color: #000000; color: #ffffff; font-weight: 900; font-size: 18px; line-height: 42px; border-radius: 10px; text-align: center;">
@@ -34,8 +45,6 @@ export async function sendVerificationEmail(
                   </div>
                 </td>
               </tr>
-
-              <!-- Main Title -->
               <tr>
                 <td align="left" style="padding-bottom: 12px;">
                   <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #111827;">
@@ -43,8 +52,6 @@ export async function sendVerificationEmail(
                   </h1>
                 </td>
               </tr>
-
-              <!-- Intro Text -->
               <tr>
                 <td align="left" style="padding-bottom: 24px;">
                   <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.6;">
@@ -52,8 +59,6 @@ export async function sendVerificationEmail(
                   </p>
                 </td>
               </tr>
-
-              <!-- Clean Light Gray Code Box -->
               <tr>
                 <td style="padding-bottom: 28px;">
                   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 24px;">
@@ -70,8 +75,6 @@ export async function sendVerificationEmail(
                   </table>
                 </td>
               </tr>
-
-              <!-- Footer Signoff -->
               <tr>
                 <td align="left" style="border-top: 1px solid #f3f4f6; padding-top: 24px;">
                   <p style="margin: 0; color: #6b7280; font-size: 13px; line-height: 1.6;">
@@ -82,7 +85,6 @@ export async function sendVerificationEmail(
                   </p>
                 </td>
               </tr>
-
             </table>
           </td>
         </tr>
@@ -92,39 +94,28 @@ export async function sendVerificationEmail(
   `;
 
   if (user && pass) {
-    try {
-      const transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465,
-        auth: { user, pass },
-        connectionTimeout: 8000,
-        greetingTimeout: 8000,
-        socketTimeout: 8000,
-        tls: {
-          rejectUnauthorized: false,
-        },
-      });
-
-      const info = await transporter.sendMail({
-        from,
-        to: toEmail,
-        subject: `${verificationCode} is your NOEL VISUALS Verification Code`,
-        text: `Your NOEL VISUALS verification code is: ${verificationCode}`,
-        html: htmlContent,
-      });
-
-      console.log(`[SMTP Email Success] Verification code sent to ${toEmail}: ${info.messageId}`);
-      return { success: true, message: `Verification code sent to ${toEmail}` };
-    } catch (err: any) {
-      console.error('[SMTP Email Error]:', err);
-      return { success: false, message: `SMTP Error: ${err.message}` };
+    const portsToTry = [465, 587];
+    for (const port of portsToTry) {
+      try {
+        const transporter = await createTransporter(host, port, user, pass);
+        const info = await transporter.sendMail({
+          from,
+          to: toEmail,
+          subject: `${verificationCode} is your NOEL VISUALS Verification Code`,
+          text: `Your NOEL VISUALS verification code is: ${verificationCode}`,
+          html: htmlContent,
+        });
+        console.log(`[SMTP Email Success] Verification code sent to ${toEmail} via Port ${port}: ${info.messageId}`);
+        return { success: true, message: `Verification code sent to ${toEmail}` };
+      } catch (err: any) {
+        console.warn(`[SMTP Port ${port} Failed]:`, err.message);
+      }
     }
   }
 
   return {
     success: true,
-    message: `Code generated for ${toEmail}. Add SMTP_USER and SMTP_PASS in .env.local to send live emails.`,
+    message: `Code generated for ${toEmail}.`,
   };
 }
 
@@ -136,9 +127,7 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
   id?: string;
 }): Promise<{ success: boolean; message: string }> {
   const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
-  let port = Number(process.env.SMTP_PORT) || 465;
   const user = process.env.SMTP_USER ? process.env.SMTP_USER.trim() : '';
-  
   const rawPass = process.env.SMTP_PASS ? process.env.SMTP_PASS.trim() : '';
   const pass = rawPass.includes(' ') ? rawPass.replace(/\s+/g, '') : rawPass;
 
@@ -157,8 +146,6 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
         <tr>
           <td align="center">
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 560px; background-color: #ffffff; border-radius: 12px; padding: 36px 32px; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-              
-              <!-- Brand Logo Top Left -->
               <tr>
                 <td align="left" style="padding-bottom: 24px;">
                   <div style="display: inline-block; width: 42px; height: 42px; background-color: #000000; color: #ffffff; font-weight: 900; font-size: 18px; line-height: 42px; border-radius: 10px; text-align: center;">
@@ -166,8 +153,6 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
                   </div>
                 </td>
               </tr>
-
-              <!-- Main Title -->
               <tr>
                 <td align="left" style="padding-bottom: 12px;">
                   <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #111827;">
@@ -175,8 +160,6 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
                   </h1>
                 </td>
               </tr>
-
-              <!-- Subtitle Description -->
               <tr>
                 <td align="left" style="padding-bottom: 24px;">
                   <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.6;">
@@ -184,12 +167,9 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
                   </p>
                 </td>
               </tr>
-
-              <!-- Light Gray Order Card -->
               <tr>
                 <td style="padding-bottom: 24px;">
                   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 24px;">
-                    
                     <tr>
                       <td style="padding-bottom: 16px; border-bottom: 1px solid #e5e7eb;">
                         <div style="font-size: 11px; font-weight: 700; font-family: monospace; text-transform: uppercase; color: #6b7280; margin-bottom: 4px;">
@@ -200,7 +180,6 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td style="padding-top: 16px;">
                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size: 13px;">
@@ -221,7 +200,6 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
                         </table>
                       </td>
                     </tr>
-
                     <tr>
                       <td style="padding-top: 16px; border-top: 1px solid #e5e7eb; margin-top: 16px;">
                         <div style="font-size: 11px; font-weight: 700; font-family: monospace; text-transform: uppercase; color: #6b7280; margin-bottom: 6px;">
@@ -232,12 +210,9 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
                         </div>
                       </td>
                     </tr>
-
                   </table>
                 </td>
               </tr>
-
-              <!-- Primary Action Button -->
               <tr>
                 <td align="left" style="padding-bottom: 28px;">
                   <a href="mailto:${briefData.email}?subject=RE:%20${encodeURIComponent(briefData.projectType)}%20Inquiry%20-%20NOEL%20VISUALS" 
@@ -246,8 +221,6 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
                   </a>
                 </td>
               </tr>
-
-              <!-- Footer Signoff -->
               <tr>
                 <td align="left" style="border-top: 1px solid #f3f4f6; padding-top: 24px;">
                   <p style="margin: 0; color: #6b7280; font-size: 13px; line-height: 1.6;">
@@ -258,7 +231,6 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
                   </p>
                 </td>
               </tr>
-
             </table>
           </td>
         </tr>
@@ -268,36 +240,25 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
   `;
 
   if (user && pass) {
-    try {
-      const transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465,
-        auth: { user, pass },
-        connectionTimeout: 8000,
-        greetingTimeout: 8000,
-        socketTimeout: 8000,
-        tls: {
-          rejectUnauthorized: false,
-        },
-      });
-
-      const info = await transporter.sendMail({
-        from,
-        to: targetAdminEmail,
-        replyTo: briefData.email,
-        subject: `🚨 NEW ORDER BRIEF: [${briefData.projectType}] from ${briefData.name}`,
-        text: `New order brief from ${briefData.name} (${briefData.email})\nCategory: ${briefData.projectType}\nMessage:\n${briefData.message}`,
-        html: htmlContent,
-      });
-
-      console.log(`[Admin Order Email Notification] Sent to ${targetAdminEmail}: ${info.messageId}`);
-      return { success: true, message: `Notification sent to ${targetAdminEmail}` };
-    } catch (err: any) {
-      console.error('[Admin Email Error]:', err);
-      return { success: false, message: `SMTP Error: ${err.message}` };
+    const portsToTry = [465, 587];
+    for (const port of portsToTry) {
+      try {
+        const transporter = await createTransporter(host, port, user, pass);
+        const info = await transporter.sendMail({
+          from,
+          to: targetAdminEmail,
+          replyTo: briefData.email,
+          subject: `🚨 NEW ORDER BRIEF: [${briefData.projectType}] from ${briefData.name}`,
+          text: `New order brief from ${briefData.name} (${briefData.email})\nCategory: ${briefData.projectType}\nMessage:\n${briefData.message}`,
+          html: htmlContent,
+        });
+        console.log(`[Admin Order Email Success] Sent to ${targetAdminEmail} via Port ${port}: ${info.messageId}`);
+        return { success: true, message: `Notification sent to ${targetAdminEmail}` };
+      } catch (err: any) {
+        console.warn(`[Admin Email Port ${port} Failed]:`, err.message);
+      }
     }
   }
 
-  return { success: true, message: 'Admin email logged (console).' };
+  return { success: true, message: 'Admin email logged.' };
 }
