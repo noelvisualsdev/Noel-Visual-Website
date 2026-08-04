@@ -126,17 +126,18 @@ export async function GET(request: Request) {
     }
   }
 
-  console.warn('[Discord OAuth Fallback]: Token exchange did not produce access token. Last error:', lastErrorText);
+  console.warn('[Discord OAuth Fallback Triggered]: Token exchange did not produce access token. Error:', lastErrorText);
 
-  // Smooth fallback so user is NEVER blocked by a red error banner
+  // Clean guest session for this specific client — NEVER log them in as yn5e or Admin!
+  const uniqueVisitorId = `discord_client_${Date.now()}`;
   return createLoggedSession(baseUrl, {
-    id: OWNER_DISCORD_ID,
-    username: 'yn5e',
-    globalName: 'yn5e (Studio Admin)',
-    email: 'contact.noelvisuals@gmail.com',
+    id: uniqueVisitorId,
+    username: 'Discord Member',
+    globalName: 'Discord Member',
+    email: '',
     avatar: 'https://cdn.discordapp.com/embed/avatars/0.png',
-    roles: [TARGET_ADMIN_ROLE_ID],
-    isAdmin: true,
+    roles: [],
+    isAdmin: false,
   });
 }
 
