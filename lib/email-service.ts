@@ -7,7 +7,10 @@ async function sendViaResendHttpApi(
   from: string
 ): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return false;
+  if (!apiKey) {
+    console.warn('[Resend HTTP API]: RESEND_API_KEY is missing in .env.local. Add RESEND_API_KEY=re_... to send live emails over Port 443 HTTPS.');
+    return false;
+  }
 
   try {
     const res = await fetch('https://api.resend.com/emails', {
