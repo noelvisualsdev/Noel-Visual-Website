@@ -15,6 +15,7 @@ export default function AdminProjectsPage() {
     'Du möchtest deinem Discord-Server einen professionellen und einzigartigen Look verpassen? Wir kreieren dein individuelles Discord-Logo!'
   );
   const [imageUrl, setImageUrl] = useState('/images/featured_edit_brand_identity.jpg');
+  const [videoUrl, setVideoUrl] = useState('');
   const [channelId, setChannelId] = useState('1533120649856417924');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -50,6 +51,7 @@ export default function AdminProjectsPage() {
           title,
           description,
           images: [imageUrl],
+          videoUrl,
           channelId,
         }),
       });
@@ -139,21 +141,23 @@ export default function AdminProjectsPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-xs font-mono uppercase text-neutral-300 block">Image URL (in images array)</label>
+              <label className="text-xs font-mono uppercase text-neutral-300 block">Image URL (Vorschaubild)</label>
               <input
                 type="text"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-white/10 text-neutral-300 font-mono text-xs"
+                placeholder="/images/... oder https://..."
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-mono uppercase text-neutral-300 block">channelId</label>
+              <label className="text-xs font-mono uppercase text-neutral-300 block">🎬 Video URL (direkt, kein YouTube)</label>
               <input
                 type="text"
-                value={channelId}
-                onChange={(e) => setChannelId(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-white/10 text-neutral-300 font-mono text-xs"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-amber-500/30 text-amber-300 font-mono text-xs"
+                placeholder="https://cdn.example.com/video.mp4"
               />
             </div>
           </div>

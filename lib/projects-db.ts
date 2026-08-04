@@ -11,9 +11,9 @@ export interface ProjectDocument {
   title: string;
   description: string;
   images: string[];
+  videoUrl?: string;  // Direct video URL (mp4/webm etc.)
   channelId?: string;
   createdAt?: string;
-  // Optional computed fields for display
   subtitle?: string;
   category?: string;
   client?: string;
@@ -49,6 +49,7 @@ export async function getProjects(): Promise<ProjectDocument[]> {
           images: Array.isArray(doc.images) && doc.images.length > 0
             ? doc.images
             : ['/images/featured_edit_city_nights.jpg'],
+          videoUrl: doc.videoUrl ? String(doc.videoUrl) : undefined,
           channelId: doc.channelId ? String(doc.channelId) : '',
           createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
           // Visual computed helpers
@@ -81,6 +82,7 @@ export async function addProject(
     title: data.title,
     description: data.description,
     images: data.images && data.images.length > 0 ? data.images : ['/images/featured_edit_city_nights.jpg'],
+    videoUrl: data.videoUrl || '',
     channelId: data.channelId || '',
     createdAt: new Date().toISOString(),
   };

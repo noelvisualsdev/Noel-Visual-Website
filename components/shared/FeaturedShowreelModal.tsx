@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Project } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Eye, TrendingUp, CheckCircle, ArrowRight } from 'lucide-react';
+import { X, Play, Pause, Volume2, VolumeX, Eye, TrendingUp, CheckCircle, ArrowRight, Film } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 
@@ -16,6 +16,10 @@ export const FeaturedShowreelModal = ({
   project,
   onClose,
 }: FeaturedShowreelModalProps) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
   if (!project) return null;
 
   const deliverablesList = Array.isArray(project.deliverables) && project.deliverables.length > 0
@@ -23,6 +27,23 @@ export const FeaturedShowreelModal = ({
     : ['4K Master Export', 'Custom Color Grade', 'PSD Source Files', 'High CTR Render'];
 
   const projectImage = project.image || project.images?.[0] || '/images/featured_edit_city_nights.jpg';
+  const videoUrl = project.videoUrl || project.video || null;
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+    } else {
+      videoRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const toggleMute = () => {
+    if (!videoRef.current) return;
+    videoRef.current.muted = !isMuted;
+    setIsMuted(!isMuted);
+  };
 
   return (
     <AnimatePresence>
@@ -39,7 +60,7 @@ export const FeaturedShowreelModal = ({
             <div className="flex items-center gap-3">
               <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
               <span className="text-xs font-mono uppercase tracking-widest text-neutral-300">
-                FEATURED SHOWREEL • {project.category || project.type || 'WORK'}
+                {videoUrl ? '▶ VIDEO PLAYBACK' : 'FEATURED SHOWREEL'} • {project.category || project.type || 'WORK'}
               </span>
             </div>
             <button
@@ -51,21 +72,70 @@ export const FeaturedShowreelModal = ({
           </div>
 
           <div className="overflow-y-auto p-6 md:p-8 space-y-6">
-            {/* Visual Showcase Box */}
+            {/* Video or Image Preview */}
             <div className="relative aspect-video rounded-xl overflow-hidden border border-white/15 bg-black group">
-              <Image
-                src={projectImage}
-                alt={project.title || 'Project'}
-                fill
-                unoptimized={projectImage?.startsWith('http')}
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-20 h-20 rounded-full bg-white/90 text-black flex items-center justify-center shadow-2xl hover:scale-110 transition-transform cursor-pointer">
-                  <Play className="w-8 h-8 fill-black translate-x-1" />
-                </div>
-              </div>
+              {videoUrl ? (
+                <>
+                  <video
+                    ref={videoRef}
+                    src={videoUrl}
+                    className="w-full h-full object-cover"
+                    playsInline
+                    onEnded={() => setIsPlaying(false)}
+                    poster={projectImage}
+                  />
+                  {/* Video Controls Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={togglePlay}
+                        className="w-10 h-10 rounded-full bg-white/90 text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+                      >
+                        {isPlaying
+                          ? <Pause className="w-4 h-4 fill-black" />
+                          : <Play className="w-4 h-4 fill-black translate-x-0.5" />
+                        }
+                      </button>
+                      <button
+                        onClick={toggleMute}
+                        className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-white/40 transition-colors"
+                      >
+                        {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                      </button>
+                      <span className="text-xs font-mono text-white/70 ml-auto flex items-center gap-1.5">
+                        <Film className="w-3.5 h-3.5" /> DIRECT VIDEO
+                      </span>
+                    </div>
+                  </div>
+                  {/* Big play button when not playing */}
+                  {!isPlaying && (
+                    <div
+                      className="absolute inset-0 flex items-center justify-center cursor-pointer"
+                      onClick={togglePlay}
+                    >
+                      <div className="w-20 h-20 rounded-full bg-white/90 text-black flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
+                        <Play className="w-8 h-8 fill-black translate-x-1" />
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Image
+                    src={projectImage}
+                    alt={project.title || 'Project'}
+                    fill
+                    unoptimized={projectImage?.startsWith('http')}
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-20 h-20 rounded-full bg-white/90 text-black flex items-center justify-center shadow-2xl hover:scale-110 transition-transform cursor-pointer">
+                      <Play className="w-8 h-8 fill-black translate-x-1" />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Project Details */}

@@ -65,16 +65,8 @@ export const PortfolioCard = ({ project, onOpenModal }: PortfolioCardProps) => {
           )}
         </div>
 
-        {/* Play Icon Hover Indicator */}
-        <motion.div
-          animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.8 }}
-          transition={{ duration: 0.2 }}
-          className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-xs"
-        >
-          <div className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow-2xl">
-            <Play className="w-6 h-6 fill-black translate-x-0.5" />
-          </div>
-        </motion.div>
+
+
       </div>
 
       {/* Content */}
