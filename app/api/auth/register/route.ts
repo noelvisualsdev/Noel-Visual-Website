@@ -32,9 +32,9 @@ export async function POST(request: Request) {
       email: email,
       passwordHash: password,
       discordUserId: discordUserId,
-      discordUsername: discordUsername || 'yn5e',
+      discordUsername: discordUsername || '',
       discordAvatar: discordAvatar || 'https://cdn.discordapp.com/embed/avatars/0.png',
-      discordRoles: ['1533100816783638729'],
+      discordRoles: [],
       isVerified: false,
       verificationCode: verificationCode,
     });

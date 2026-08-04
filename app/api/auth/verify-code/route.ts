@@ -34,13 +34,13 @@ export async function POST(request: Request) {
     });
 
     const userSession = {
-      id: result.customer.discordUserId || '1208827674185957447',
+      id: result.customer.discordUserId || result.customer._id || `user_${Date.now()}`,
       username: result.customer.username,
       email: result.customer.email,
-      discordUsername: result.customer.discordUsername || 'yn5e',
+      discordUsername: result.customer.discordUsername || '',
       avatar: result.customer.discordAvatar || 'https://cdn.discordapp.com/embed/avatars/0.png',
-      roles: result.customer.discordRoles || ['1533100816783638729'],
-      isAdmin: true,
+      roles: result.customer.discordRoles || [],
+      isAdmin: false, // Admin access only granted via Discord staff role — never automatically
       isVerified: true,
     };
 

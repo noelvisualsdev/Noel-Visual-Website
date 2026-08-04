@@ -80,7 +80,7 @@ export async function createCustomer(
     discordUserId: data.discordUserId || '',
     discordUsername: data.discordUsername || '',
     discordAvatar: data.discordAvatar || '',
-    discordRoles: data.discordRoles || ['1533100816783638729'],
+    discordRoles: data.discordRoles || [],
     isVerified: data.isVerified ?? false,
     verificationCode: data.verificationCode || Math.floor(100000 + Math.random() * 900000).toString(),
     verificationExpiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
