@@ -80,9 +80,13 @@ export async function saveBrief(
     try {
       const client = await clientPromise;
       const db = client.db('noelvisuals');
+      const timestamp = Date.now();
+      const randomSuffix = Math.floor(Math.random() * 1000000);
       const docToInsert = {
         ...newBriefData,
-        id: `BR-${Date.now().toString().slice(-4)}`,
+        id: `BR-${timestamp.toString().slice(-4)}`,
+        channelId: `web-ticket-${timestamp}-${randomSuffix}`,
+        ticketId: `web-ticket-${timestamp}-${randomSuffix}`,
         createdAt: new Date(),
       };
       const res = await db.collection('tickets').insertOne(docToInsert);

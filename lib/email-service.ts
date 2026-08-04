@@ -136,7 +136,7 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
   id?: string;
 }): Promise<{ success: boolean; message: string }> {
   const host = (process.env.SMTP_HOST || 'smtp.gmail.com').trim();
-  const port = Number(process.env.SMTP_PORT) || 587;
+  let port = Number(process.env.SMTP_PORT) || 465;
   const user = process.env.SMTP_USER ? process.env.SMTP_USER.trim() : '';
   
   const rawPass = process.env.SMTP_PASS ? process.env.SMTP_PASS.trim() : '';
