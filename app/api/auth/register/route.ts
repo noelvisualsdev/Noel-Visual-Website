@@ -14,13 +14,6 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!discordUserId) {
-      return NextResponse.json(
-        { success: false, message: 'You must link your Discord Account before registering.' },
-        { status: 400 }
-      );
-    }
-
     // Check if account already exists
     const existing = await findCustomerByEmail(email);
     if (existing) {

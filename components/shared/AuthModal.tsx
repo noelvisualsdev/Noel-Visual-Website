@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, User, Lock, CheckCircle2, AlertCircle, ArrowRight, RefreshCw, Send, LogIn, UserPlus } from 'lucide-react';
+import { X, Mail, User, Lock, CheckCircle2, AlertCircle, ArrowRight, RefreshCw, Send, LogIn, UserPlus, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/components/providers/AuthProvider';
 
@@ -30,6 +30,31 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { user, loginWithDiscord } = useAuth();
+
+  // Read Discord link data from URL params (returned by link_only OAuth flow)
+  const [linkedDiscord, setLinkedDiscord] = useState<{
+    id: string; username: string; avatar: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('discord_linked') === '1') {
+      setLinkedDiscord({
+        id: p.get('discord_id') || '',
+        username: p.get('discord_username') || '',
+        avatar: p.get('discord_avatar') || '',
+      });
+      // Clean URL without reload
+      window.history.replaceState({}, '', window.location.pathname);
+      // Auto-open register tab
+      setMode('register');
+    }
+  }, []);
+
+  const handleLinkDiscord = () => {
+    window.location.href = '/api/auth/discord/login?mode=link_only';
+  };
 
   if (!isOpen) return null;
 
@@ -60,9 +85,10 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           username,
           email,
           password,
-          discordUserId: user?.id || '',
-          discordUsername: user?.username || '',
-          discordAvatar: user?.avatar || '',
+          // Discord is optional
+          discordUserId: linkedDiscord?.id || user?.id || '',
+          discordUsername: linkedDiscord?.username || user?.username || '',
+          discordAvatar: linkedDiscord?.avatar || user?.avatar || '',
         }),
       });
 
@@ -263,20 +289,21 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           {/* CREATE ACCOUNT MODE */}
           {mode === 'register' && (
             <form onSubmit={handleRegister} className="space-y-4 relative z-10">
-              {user?.id ? (
+              {/* Discord Link Section */}
+              {(linkedDiscord?.id || user?.id) ? (
                 <div className="p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-500/30 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <img
-                      src={user.avatar || user.image || 'https://cdn.discordapp.com/embed/avatars/0.png'}
-                      alt={user.username || 'Discord User'}
+                      src={linkedDiscord?.avatar || user?.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}
+                      alt="Discord"
                       className="w-9 h-9 rounded-full border border-indigo-400/30 object-cover"
                     />
                     <div>
                       <span className="text-xs font-bold text-white uppercase block">
-                        DISCORD LINKED: @{user.username || user.name || 'User'}
+                        DISCORD LINKED: @{linkedDiscord?.username || user?.username || 'User'}
                       </span>
                       <span className="text-[10px] font-mono text-indigo-300 block">
-                        ID: {user.id} (Verified ✓)
+                        ID: {linkedDiscord?.id || user?.id} (Verified ✓)
                       </span>
                     </div>
                   </div>
@@ -285,10 +312,13 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
               ) : (
                 <button
                   type="button"
-                  onClick={() => loginWithDiscord()}
+                  onClick={handleLinkDiscord}
                   className="w-full p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/20 transition-all font-bold text-xs flex items-center justify-between"
                 >
-                  <span className="font-mono text-[11px] uppercase">OPTIONAL: LINK DISCORD ACCOUNT</span>
+                  <div className="flex items-center gap-2">
+                    <Link2 className="w-3.5 h-3.5" />
+                    <span className="font-mono text-[11px] uppercase">OPTIONAL: Link Discord Account</span>
+                  </div>
                   <span className="bg-indigo-500 text-white text-[10px] px-2 py-0.5 rounded font-mono font-bold">CONNECT</span>
                 </button>
               )}

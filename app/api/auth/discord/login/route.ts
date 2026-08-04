@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const mode = searchParams.get('mode') || 'login';
   const clientId = (process.env.DISCORD_CLIENT_ID || process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '').trim();
   
   const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'noelvisuals.com';
@@ -15,7 +17,7 @@ export async function GET(request: Request) {
 
   const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
     redirectUri
-  )}&response_type=code&scope=identify%20email`;
+  )}&response_type=code&scope=identify%20email&state=${encodeURIComponent(mode)}`;
 
   return NextResponse.redirect(discordAuthUrl);
 }

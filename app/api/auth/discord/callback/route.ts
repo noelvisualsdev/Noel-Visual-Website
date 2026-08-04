@@ -7,6 +7,7 @@ const OWNER_DISCORD_ID = '1208827674185957447';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
+  const state = searchParams.get('state') || '';
 
   const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'noelvisuals.com';
   const proto = request.headers.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
@@ -89,18 +90,29 @@ export async function GET(request: Request) {
 
       if (userResponse.ok) {
         const discordUser = await userResponse.json();
+        const avatarUrl = discordUser.avatar
+          ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
+          : `https://cdn.discordapp.com/embed/avatars/0.png`;
+
+        // link_only mode: return Discord data to the registration page without logging in
+        if (state === 'link_only') {
+          const params = new URLSearchParams({
+            discord_id: discordUser.id,
+            discord_username: discordUser.username || discordUser.global_name || 'User',
+            discord_avatar: avatarUrl,
+            discord_linked: '1',
+          });
+          return NextResponse.redirect(`${baseUrl}/?${params.toString()}`);
+        }
+
         let isAdmin = discordUser.id === OWNER_DISCORD_ID;
         let roles: string[] = [];
 
-        if (process.env.DISCORD_BOT_TOKEN && process.env.DISCORD_GUILD_ID) {
+        if (process.env.DISCORD_BOT_TOKEN) {
           const roleResult = await checkDiscordUserAdminRole(discordUser.id);
           if (roleResult.isAdmin) isAdmin = true;
           if (roleResult.roles.length > 0) roles = roleResult.roles;
         }
-
-        const avatarUrl = discordUser.avatar
-          ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
-          : `https://cdn.discordapp.com/embed/avatars/0.png`;
 
         await recordUserSession({
           userId: discordUser.id,
@@ -126,19 +138,9 @@ export async function GET(request: Request) {
     }
   }
 
-  console.warn('[Discord OAuth Fallback Triggered]: Token exchange did not produce access token. Error:', lastErrorText);
-
-  // Clean guest session for this specific client — NEVER log them in as yn5e or Admin!
-  const uniqueVisitorId = `discord_client_${Date.now()}`;
-  return createLoggedSession(baseUrl, {
-    id: uniqueVisitorId,
-    username: 'Discord Member',
-    globalName: 'Discord Member',
-    email: '',
-    avatar: 'https://cdn.discordapp.com/embed/avatars/0.png',
-    roles: [],
-    isAdmin: false,
-  });
+  console.warn('[Discord OAuth Fallback Triggered]: Token exchange failed. Error:', lastErrorText);
+  // Do NOT create a fake session — just redirect home with an error flag
+  return NextResponse.redirect(`${baseUrl}/?discord_error=1`);
 }
 
 function createLoggedSession(baseUrl: string, userData: any) {
