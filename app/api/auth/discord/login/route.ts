@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
-  const clientId = process.env.DISCORD_CLIENT_ID || process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID;
-  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  const clientId = (process.env.DISCORD_CLIENT_ID || process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '').trim();
+  const requestOrigin = new URL(request.url).origin;
+  const baseUrl = (process.env.NEXTAUTH_URL || requestOrigin).trim().replace(/\/$/, '');
   
-  // Custom redirect URI or default
-  const redirectUri = process.env.DISCORD_REDIRECT_URI || `${baseUrl}/api/auth/discord/callback`;
+  // Dynamically resolve redirect URI from request origin to prevent www vs non-www mismatches
+  const redirectUri = (process.env.DISCORD_REDIRECT_URI || `${requestOrigin}/api/auth/discord/callback`).trim();
 
   if (!clientId || clientId === '100000000000000000') {
     return NextResponse.redirect(`${baseUrl}?error=missing_client_id`);
