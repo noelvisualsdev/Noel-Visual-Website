@@ -1,14 +1,48 @@
 import nodemailer from 'nodemailer';
 
+async function sendViaResendHttpApi(
+  to: string,
+  subject: string,
+  html: string,
+  from: string
+): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return false;
+
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey.trim()}`,
+      },
+      body: JSON.stringify({
+        from: from || 'NOEL VISUALS <onboarding@resend.dev>',
+        to: [to],
+        subject,
+        html,
+      }),
+    });
+
+    if (res.ok) {
+      console.log(`[Resend HTTP API Success] Sent email to ${to}`);
+      return true;
+    }
+  } catch (err: any) {
+    console.warn('[Resend HTTP API Warning]:', err.message);
+  }
+  return false;
+}
+
 async function createTransporter(host: string, port: number, user: string, pass: string) {
   return nodemailer.createTransport({
     host,
     port,
     secure: port === 465,
     auth: { user, pass },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
+    connectionTimeout: 4000,
+    greetingTimeout: 4000,
+    socketTimeout: 4000,
     tls: {
       rejectUnauthorized: false,
     },
@@ -93,6 +127,18 @@ export async function sendVerificationEmail(
     </html>
   `;
 
+  // 1. Try Resend HTTP API (Port 443 HTTPS - Never blocked!)
+  const sentViaResend = await sendViaResendHttpApi(
+    toEmail,
+    `${verificationCode} is your NOEL VISUALS Verification Code`,
+    htmlContent,
+    from
+  );
+  if (sentViaResend) {
+    return { success: true, message: `Verification code sent to ${toEmail} via Resend HTTP API` };
+  }
+
+  // 2. Fallback to Nodemailer SMTP
   if (user && pass) {
     const portsToTry = [465, 587];
     for (const port of portsToTry) {
@@ -108,7 +154,7 @@ export async function sendVerificationEmail(
         console.log(`[SMTP Email Success] Verification code sent to ${toEmail} via Port ${port}: ${info.messageId}`);
         return { success: true, message: `Verification code sent to ${toEmail}` };
       } catch (err: any) {
-        console.warn(`[SMTP Port ${port} Failed]:`, err.message);
+        console.warn(`[SMTP Port ${port} Skipped]: ${err.message}`);
       }
     }
   }
@@ -133,6 +179,7 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
 
   const targetAdminEmail = 'contact.noelvisuals@gmail.com';
   const from = process.env.SMTP_FROM || `"NOEL VISUALS ORDERS" <${user || 'contact.noelvisuals@gmail.com'}>`;
+  const subject = `🚨 NEW ORDER BRIEF: [${briefData.projectType}] from ${briefData.name}`;
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -239,6 +286,18 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
     </html>
   `;
 
+  // 1. Try Resend HTTP API (Port 443 HTTPS - Never blocked by VPS firewall!)
+  const sentViaResend = await sendViaResendHttpApi(
+    targetAdminEmail,
+    subject,
+    htmlContent,
+    from
+  );
+  if (sentViaResend) {
+    return { success: true, message: `Notification sent to ${targetAdminEmail} via Resend HTTP API` };
+  }
+
+  // 2. Fallback to Nodemailer SMTP
   if (user && pass) {
     const portsToTry = [465, 587];
     for (const port of portsToTry) {
@@ -248,14 +307,14 @@ export async function sendNewBriefNotificationToAdmin(briefData: {
           from,
           to: targetAdminEmail,
           replyTo: briefData.email,
-          subject: `🚨 NEW ORDER BRIEF: [${briefData.projectType}] from ${briefData.name}`,
+          subject,
           text: `New order brief from ${briefData.name} (${briefData.email})\nCategory: ${briefData.projectType}\nMessage:\n${briefData.message}`,
           html: htmlContent,
         });
         console.log(`[Admin Order Email Success] Sent to ${targetAdminEmail} via Port ${port}: ${info.messageId}`);
         return { success: true, message: `Notification sent to ${targetAdminEmail}` };
       } catch (err: any) {
-        console.warn(`[Admin Email Port ${port} Failed]:`, err.message);
+        console.warn(`[Admin Email Port ${port} Skipped]: ${err.message}`);
       }
     }
   }
