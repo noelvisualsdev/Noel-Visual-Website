@@ -1,5 +1,9 @@
 import nodemailer from 'nodemailer';
 
+export async function sendViaResendOrFallback(to: string, subject: string, html: string): Promise<boolean> {
+  return sendViaResendHttpApi(to, subject, html, process.env.RESEND_FROM || 'NOEL VISUALS <onboarding@resend.dev>');
+}
+
 async function sendViaResendHttpApi(
   to: string,
   subject: string,
