@@ -1,0 +1,141 @@
+'use client';
+
+import React from 'react';
+import { Project } from '@/types';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Play, Eye, TrendingUp, CheckCircle, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import { Button } from '@/components/ui/Button';
+
+interface FeaturedShowreelModalProps {
+  project: any | null;
+  onClose: () => void;
+}
+
+export const FeaturedShowreelModal = ({
+  project,
+  onClose,
+}: FeaturedShowreelModalProps) => {
+  if (!project) return null;
+
+  const deliverablesList = Array.isArray(project.deliverables) && project.deliverables.length > 0
+    ? project.deliverables
+    : ['4K Master Export', 'Custom Color Grade', 'PSD Source Files', 'High CTR Render'];
+
+  const projectImage = project.image || project.images?.[0] || '/images/featured_edit_city_nights.jpg';
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10 bg-black/80 backdrop-blur-xl">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="relative w-full max-w-4xl bg-[#0c0d12] border border-white/20 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+        >
+          {/* Header Bar */}
+          <div className="p-4 px-6 border-b border-white/10 flex items-center justify-between bg-black/40">
+            <div className="flex items-center gap-3">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+              <span className="text-xs font-mono uppercase tracking-widest text-neutral-300">
+                FEATURED SHOWREEL • {project.category || project.type || 'WORK'}
+              </span>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-lg bg-white/5 hover:bg-white/15 text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="overflow-y-auto p-6 md:p-8 space-y-6">
+            {/* Visual Showcase Box */}
+            <div className="relative aspect-video rounded-xl overflow-hidden border border-white/15 bg-black group">
+              <Image
+                src={projectImage}
+                alt={project.title || 'Project'}
+                fill
+                unoptimized={projectImage?.startsWith('http')}
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-full bg-white/90 text-black flex items-center justify-center shadow-2xl hover:scale-110 transition-transform cursor-pointer">
+                  <Play className="w-8 h-8 fill-black translate-x-1" />
+                </div>
+              </div>
+            </div>
+
+            {/* Project Details */}
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+                <div>
+                  <h2 className="text-3xl font-extrabold text-white tracking-tight uppercase">
+                    {project.title}
+                  </h2>
+                  <p className="text-xs font-mono text-neutral-400 uppercase tracking-widest mt-1">
+                    {project.subtitle || project.type || 'CINEMATIC WORK'} • CLIENT: {project.client || 'Verified Creator'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  {project.views && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-white/10 text-white border border-white/15">
+                      <Eye className="w-3.5 h-3.5" />
+                      {project.views}
+                    </span>
+                  )}
+                  {project.ctrIncrease && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold">
+                      <TrendingUp className="w-3.5 h-3.5" />
+                      {project.ctrIncrease}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <p className="text-sm text-neutral-300 leading-relaxed">
+                {project.description}
+              </p>
+
+              {/* Deliverables Grid */}
+              <div className="space-y-2 pt-2">
+                <h4 className="text-xs font-mono uppercase tracking-widest text-neutral-400">
+                  Project Scope & Deliverables
+                </h4>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {deliverablesList.map((item: string) => (
+                    <div
+                      key={item}
+                      className="p-3 rounded-lg bg-white/5 border border-white/5 text-xs text-neutral-200 flex items-center gap-2"
+                    >
+                      <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="pt-4 flex items-center justify-end gap-4 border-t border-white/10">
+              <Button variant="ghost" size="sm" onClick={onClose}>
+                Close Preview
+              </Button>
+              <Button
+                href="/contact"
+                variant="glow"
+                size="sm"
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+                onClick={onClose}
+              >
+                REQUEST SIMILAR PROJECT
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+};

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "rev-1",
+    "quote": "NOEL VISUALS completely transformed our channel CTR from 4.1% to 9.8%. The thumbnail quality and cinematic edits are unmatched in the industry.",
+    "author": "Alex Vance",
+    "role": "Lead Content Creator",
+    "company": "VanceTech",
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+    "rating": 5,
+    "metricBadge": "2.4M Subs • 120M+ Views",
+    "projectCategory": "Video Editing & Thumbnails",
+    "verified": true
+  },
+  {
+    "id": "rev-2",
+    "quote": "Fast, reliable, and absurdly talented. Every video they edit lands directly on trending. Our audience retention jumped by over 35%.",
+    "author": "Elena Rostova",
+    "role": "Head of Media",
+    "company": "Apex Gaming Guild",
+    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+    "rating": 5,
+    "metricBadge": "1.1M Subs • 45M+ Views",
+    "projectCategory": "Full Retainer",
+    "verified": true
+  },
+  {
+    "id": "rev-3",
+    "quote": "The 3D motion graphics and brand identity they designed gave our product launch the exact luxury aesthetic we needed to close our Series A.",
+    "author": "Marcus Sterling",
+    "role": "Founder & CEO",
+    "company": "Luminous Audio Labs",
+    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+    "rating": 5,
+    "metricBadge": "15M+ Impressions",
+    "projectCategory": "3D Brand Identity",
+    "verified": true
+  },
+  {
+    "id": "rev-4",
+    "quote": "Turnaround in under 24 hours without sacrificing a single detail. The custom sound design and color grade were pure perfection.",
+    "author": "David Chen",
+    "role": "Executive Producer",
+    "company": "CyberPulse Media",
+    "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
+    "rating": 5,
+    "metricBadge": "+5.4% CTR Surge",
+    "projectCategory": "Cinematic VFX",
+    "verified": true
+  },
+  {
+    "id": "rev-5",
+    "quote": "Their thumbnail designs alone doubled our click-through rate in the first week. Best investment we made for our brand this year.",
+    "author": "Sophia Martinez",
+    "role": "Growth Director",
+    "company": "Elevate Lifestyle",
+    "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150",
+    "rating": 5,
+    "metricBadge": "9.8% Average CTR",
+    "projectCategory": "Thumbnail Suite",
+    "verified": true
+  },
+  {
+    "id": "rev-6",
+    "quote": "The pacing and storytelling in their cuts keep viewers hooked from second 1. Average view duration went from 4:30 to 8:15!",
+    "author": "Liam O’Connor",
+    "role": "YouTuber & Streamer",
+    "company": "O’Connor Studio",
+    "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150",
+    "rating": 5,
+    "metricBadge": "850K Subs • +82% AVD",
+    "projectCategory": "Video Editing",
+    "verified": true
+  }
+]

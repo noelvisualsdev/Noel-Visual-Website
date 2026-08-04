@@ -1,0 +1,50 @@
+[
+  {
+    "username": "Diego",
+    "email": "kaanziate@gmail.com",
+    "passwordHash": "test123",
+    "discordUserId": "1208827674185957447",
+    "discordUsername": "yn5e",
+    "discordAvatar": "https://cdn.discordapp.com/embed/avatars/0.png",
+    "discordRoles": [
+      "1533100816783638729"
+    ],
+    "isVerified": false,
+    "verificationCode": "829815",
+    "verificationExpiresAt": "2026-08-04T12:18:01.871Z",
+    "createdAt": "2026-08-04T12:03:01.871Z",
+    "id": "cust-1785844982026"
+  },
+  {
+    "username": "Diego",
+    "email": "kaanziate2@gmail.com",
+    "passwordHash": "test123",
+    "discordUserId": "1208827674185957447",
+    "discordUsername": "yn5e",
+    "discordAvatar": "https://cdn.discordapp.com/embed/avatars/0.png",
+    "discordRoles": [
+      "1533100816783638729"
+    ],
+    "isVerified": false,
+    "verificationCode": "433928",
+    "verificationExpiresAt": "2026-08-04T12:14:22.086Z",
+    "createdAt": "2026-08-04T11:59:22.086Z",
+    "id": "cust-1785844762233"
+  },
+  {
+    "username": "Diego",
+    "email": "kaankanalles1234@gmail.com",
+    "passwordHash": "test123",
+    "discordUserId": "1208827674185957447",
+    "discordUsername": "yn5e",
+    "discordAvatar": "https://cdn.discordapp.com/embed/avatars/0.png",
+    "discordRoles": [
+      "1533100816783638729"
+    ],
+    "isVerified": false,
+    "verificationCode": "264007",
+    "verificationExpiresAt": "2026-08-04T12:12:03.132Z",
+    "createdAt": "2026-08-04T11:57:03.132Z",
+    "id": "cust-1785844623271"
+  }
+]

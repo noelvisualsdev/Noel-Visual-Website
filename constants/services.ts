@@ -1,0 +1,95 @@
+import { Service } from '@/types';
+
+export const SERVICES_CATALOG: Service[] = [
+  {
+    id: 'video-editing',
+    slug: 'video-editing',
+    title: 'Video Editing',
+    shortDescription: 'Cinematic edits that tell your story with impact.',
+    fullDescription:
+      'We transform raw footage into captivating narratives with fast-paced pacing, sound design, seamless transitions, and high-end visual polish.',
+    iconName: 'Clapperboard',
+    benefits: ['Hooks viewers in 3 seconds', 'Increases average watch time', 'Custom sound design'],
+    deliverables: ['Full Length Video (16:9)', 'Shorts/Reels/TikTok (9:16)', 'Custom Sound Mix', 'Color Grade LUT'],
+    deliverTime: '24 - 48 Hours',
+    featured: true,
+  },
+  {
+    id: 'thumbnail-design',
+    slug: 'thumbnail-design',
+    title: 'Thumbnail Design',
+    shortDescription: 'High CTR thumbnails that get more clicks.',
+    fullDescription:
+      'Engineered thumbnails designed for algorithm dominance. We use focal lighting, 3D typography, and human emotion hooks to maximize click-through rates.',
+    iconName: 'Image',
+    benefits: ['Proven +3-7% CTR uplift', 'High contrast 3D lighting', 'Optimized for mobile feeds'],
+    deliverables: ['High-Res PNG/JPG', 'Photoshop PSD Files', 'A/B Test Variant', 'Unlimited Revisions'],
+    deliverTime: '12 - 24 Hours',
+    featured: true,
+  },
+  {
+    id: 'graphic-social-design',
+    slug: 'graphic-social-design',
+    title: 'Grafik- & Social Media Design',
+    shortDescription: 'Clean, modern visuals that build your brand.',
+    fullDescription:
+      'Cohesive visual assets ranging from social banners, stream overlays, promotional posters, to full digital design systems.',
+    iconName: 'PencilRuler',
+    benefits: ['Distinctive brand identity', 'Pixel-perfect precision', 'Vector scalable assets'],
+    deliverables: ['Social Media Banners', 'Stream Overlays', 'Merch & Product Art', 'Vector Files'],
+    deliverTime: '24 - 72 Hours',
+    featured: true,
+  },
+  {
+    id: 'ui-ux-design',
+    slug: 'ui-ux-design',
+    title: 'UI / UX Design',
+    shortDescription: 'Modern web & mobile interface experiences.',
+    fullDescription:
+      'Custom user interface design, landing pages, interactive web apps, and design systems crafted for high conversion and engagement.',
+    iconName: 'PencilRuler',
+    benefits: ['Responsive grid systems', 'Figma source files', 'High converting UX flows'],
+    deliverables: ['Figma Prototype', 'UI Component Library', 'Design Tokens'],
+    deliverTime: '2 - 5 Days',
+    featured: true,
+  },
+  {
+    id: 'creator-packages',
+    slug: 'creator-packages',
+    title: 'Monatliche Creator Pakete',
+    shortDescription: 'Full monthly retainer packages for active creators.',
+    fullDescription:
+      'Unlimited thumbnail design, video editing, social media assets, and dedicated editor access on a predictable monthly retainer.',
+    iconName: 'Zap',
+    benefits: ['Dedicated lead editor', 'Priority 24h queue', 'Predictable monthly fee'],
+    deliverables: ['Weekly Video Edits', 'Unlimited Thumbnails', 'Daily Assets'],
+    deliverTime: 'Monthly Retainer',
+    featured: true,
+  },
+  {
+    id: 'discord-server-setup',
+    slug: 'discord-server-setup',
+    title: 'Discord Server Setup',
+    shortDescription: 'Professional Discord server design & permission hierarchy.',
+    fullDescription:
+      'Custom channel layouts, role hierarchies, auto-moderation, verification systems, aesthetic branding, and welcoming onboarding flows.',
+    iconName: 'Zap',
+    benefits: ['Clean role hierarchy', 'Auto-mod & security', 'Custom aesthetic graphics'],
+    deliverables: ['Full Server Structure', 'Role & Category Setup', 'Welcome Banners'],
+    deliverTime: '24 - 48 Hours',
+    featured: true,
+  },
+  {
+    id: 'discord-bot',
+    slug: 'discord-bot',
+    title: 'Discord Bot',
+    shortDescription: 'Custom Discord bots tailored for your community.',
+    fullDescription:
+      'Custom Discord bot development including ticket systems, giveaway bots, leveling, role management, and API integrations.',
+    iconName: 'Zap',
+    benefits: ['24/7 Uptime hosting setup', 'Custom slash commands', 'Secure database sync'],
+    deliverables: ['Custom Bot Source Code', 'Hosting Deployment', 'Admin Control Panel'],
+    deliverTime: '2 - 4 Days',
+    featured: true,
+  },
+];

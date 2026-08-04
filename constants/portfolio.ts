@@ -1,0 +1,66 @@
+import { Project } from '@/types';
+
+export const FEATURED_PROJECTS: Project[] = [
+  {
+    id: 'city-nights',
+    title: 'CITY NIGHTS',
+    subtitle: 'CINEMATIC EDIT FOR LIFESTYLE BRAND',
+    category: 'Editing',
+    client: 'Lifestyle Brand',
+    image: '/images/featured_edit_city_nights.jpg',
+    duration: '1:02',
+    views: '12.4M',
+    ctrIncrease: '+6.2%',
+    description:
+      'High-octane, atmospheric edit combining rain-soaked urban street culture, custom sound design, and razor-sharp color grading for a global automotive lifestyle launch.',
+    deliverables: ['4K Cinematic Edit', 'Sound Design & Mixing', 'Color Grading', 'Social Cutdowns (9:16)'],
+    year: '2026',
+    featured: true,
+  },
+  {
+    id: 'neon-cyber-pulse',
+    title: 'NEON CYBER PULSE',
+    subtitle: '3D KINETIC MOTION DESIGN FOR TECH GIANTS',
+    category: 'VFX',
+    client: 'CyberTech Global',
+    image: '/images/featured_edit_neon_cyber.jpg',
+    duration: '0:45',
+    views: '8.9M',
+    ctrIncrease: '+5.4%',
+    description:
+      'Futuristic motion graphics showcase leveraging volumetric lighting, glass refraction shaders, and sync-heavy kinetic typography for product reveal.',
+    deliverables: ['3D Motion Graphics', 'Kinetic Typography', 'Logo Intro/Outro', '4K Master'],
+    year: '2026',
+    featured: true,
+  },
+  {
+    id: 'apex-thumbnail-system',
+    title: 'APEX THUMBNAIL SUITE',
+    subtitle: 'HIGH-CTR THUMBNAILS FOR TOP CREATORS',
+    category: 'Thumbnails',
+    client: 'Apex Gaming & Esports',
+    image: '/images/featured_edit_thumbnail_art.jpg',
+    views: '34M+',
+    ctrIncrease: '+8.1%',
+    description:
+      'Ultra high CTR thumbnail pack built with custom 3D character renders, high contrast rim lighting, and focal point hierarchy engineered for max clicks.',
+    deliverables: ['10x Thumbnail Designs', 'PSD Source Files', 'A/B Testing Variants', 'Color Preset Guide'],
+    year: '2026',
+    featured: true,
+  },
+  {
+    id: 'luminous-brand-identity',
+    title: 'LUMINOUS IDENTITY',
+    subtitle: 'METALLIC BRANDING & VISUAL SYSTEM',
+    category: 'Brand Identity',
+    client: 'Luminous Audio',
+    image: '/images/featured_edit_brand_identity.jpg',
+    views: '5.2M',
+    ctrIncrease: '+4.0%',
+    description:
+      'Complete brand identity overhaul including metallic 3D logo suite, motion brand guidelines, typography system, and custom social media templates.',
+    deliverables: ['Brand Architecture', '3D Asset Library', 'Design System', 'Social Brand Kit'],
+    year: '2025',
+    featured: true,
+  },
+];

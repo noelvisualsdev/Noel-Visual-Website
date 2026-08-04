@@ -1,0 +1,61 @@
+[
+  {
+    "name": "Moritz Nathan",
+    "email": "moritz.nathan26@gmail.com",
+    "projectType": "Video Editing",
+    "budgetRange": "Custom Quote",
+    "timeline": "Flexible",
+    "message": "dwadwadada",
+    "status": "New Brief",
+    "createdAt": "2026-08-04T13:35:34.796Z",
+    "id": "BR-1054"
+  },
+  {
+    "_id": "6a71d62df1cfff91ed960cfa",
+    "id": "TICKET-960CFA",
+    "name": "Client",
+    "email": "client@discord.gg",
+    "projectType": "Custom Work",
+    "budgetRange": "Custom Quote",
+    "timeline": "Flexible",
+    "message": "",
+    "status": "closed",
+    "createdAt": "2026-08-04T12:08:13.331Z"
+  },
+  {
+    "_id": "6a71d1ae7d841b972d4a489c",
+    "id": "BR-2433",
+    "name": "Moritz Nathan",
+    "email": "moritz.nathan26@gmail.com",
+    "projectType": "Editing",
+    "budgetRange": "<$1,000",
+    "timeline": "1-2 Weeks",
+    "message": "dwadadwadada",
+    "status": "New Brief",
+    "createdAt": "2026-08-04T11:49:02.433Z"
+  },
+  {
+    "_id": "6a71d10df1cfff91ed960cf7",
+    "id": "TICKET-960CF7",
+    "name": "Client",
+    "email": "client@discord.gg",
+    "projectType": "Custom Work",
+    "budgetRange": "Custom Quote",
+    "timeline": "Flexible",
+    "message": "",
+    "status": "closed",
+    "createdAt": "2026-08-04T11:46:21.244Z"
+  },
+  {
+    "_id": "6a71c755f6c51030d211a6d8",
+    "id": "TICKET-11A6D8",
+    "name": "Client",
+    "email": "client@discord.gg",
+    "projectType": "Custom Work",
+    "budgetRange": "Custom Quote",
+    "timeline": "Flexible",
+    "message": "",
+    "status": "closed",
+    "createdAt": "2026-08-04T11:04:53.242Z"
+  }
+]
