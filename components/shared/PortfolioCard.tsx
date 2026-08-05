@@ -45,15 +45,16 @@ export const PortfolioCard = ({ project, onOpenModal }: PortfolioCardProps) => {
             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
         ) : (
-          <Image
+          <img
             src={displayImage}
-            alt={project.title || 'Portfolio Item'}
-            fill
-            unoptimized={displayImage.startsWith('http')}
-            onError={() => setImgError(true)}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-            priority={project.featured}
+            alt=""
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (!target.src.endsWith(fallbackImage)) {
+                target.src = fallbackImage;
+              }
+            }}
+            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
         )}
 

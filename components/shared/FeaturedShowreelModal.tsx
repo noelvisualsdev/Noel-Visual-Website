@@ -168,13 +168,16 @@ export const FeaturedShowreelModal = ({
                 </>
               ) : (
                 <>
-                  <Image
+                  <img
                     src={posterImage}
-                    alt={project.title || 'Project'}
-                    fill
-                    unoptimized={posterImage.startsWith('http')}
-                    onError={() => setImgError(true)}
-                    className="object-cover"
+                    alt=""
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.src.endsWith(fallbackImage)) {
+                        target.src = fallbackImage;
+                      }
+                    }}
+                    className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                 </>
