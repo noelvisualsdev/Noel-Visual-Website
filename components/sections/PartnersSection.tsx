@@ -34,7 +34,7 @@ export const PartnersSection = () => {
   if (!isLoading && partners.length === 0) return null;
 
   return (
-    <Section id="partners" className="bg-[#070709] border-t border-white/5 overflow-hidden">
+    <Section id="partners" className="bg-transparent border-t border-white/5 overflow-hidden">
       <Container size="lg">
         {/* Loading skeleton */}
         {isLoading && (

@@ -15,7 +15,7 @@ export const FAQSection = () => {
   }));
 
   return (
-    <Section id="faq" className="bg-[#070709]">
+    <Section id="faq" className="bg-transparent">
       <Container size="md" className="space-y-12">
         <SectionHeader
           badge="FREQUENTLY ASKED QUESTIONS"

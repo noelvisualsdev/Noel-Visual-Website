@@ -9,7 +9,7 @@ import { ShieldCheck, Award, Sparkles, Users } from 'lucide-react';
 
 export const AboutSection = () => {
   return (
-    <Section id="about" className="bg-[#090a0d] border-t border-white/5">
+    <Section id="about" className="bg-transparent border-t border-white/5">
       <Container size="lg" className="space-y-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-6 space-y-6">

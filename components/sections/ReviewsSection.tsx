@@ -118,7 +118,7 @@ export const ReviewsSection = () => {
   const marqueeRow2 = [...reviews].reverse().concat([...reviews].reverse());
 
   return (
-    <Section id="reviews" className="bg-[#070709] py-20 overflow-hidden relative">
+    <Section id="reviews" className="bg-transparent py-20 overflow-hidden relative">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] bg-white/[0.02] blur-[150px] rounded-full pointer-events-none" />
 

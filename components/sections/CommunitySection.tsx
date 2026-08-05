@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button';
 
 export const CommunitySection = () => {
   return (
-    <Section id="reviews" className="bg-[#090a0d] border-t border-white/5">
+    <Section id="reviews" className="bg-transparent border-t border-white/5">
       <Container size="lg" className="space-y-16">
         <SectionHeader
           badge="CLIENT REVIEWS & PROOF"

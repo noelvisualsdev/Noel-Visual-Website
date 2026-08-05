@@ -17,7 +17,7 @@ export const ServicesSection = ({ previewOnly = false }: ServicesSectionProps) =
     : SERVICES_CATALOG;
 
   return (
-    <Section id="services" className="bg-[#090a0d]">
+    <Section id="services" className="bg-transparent">
       <Container size="lg" className="space-y-12">
         <SectionHeader
           badge="OUR CORE CAPABILITIES"

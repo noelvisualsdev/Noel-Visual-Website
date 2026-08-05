@@ -11,7 +11,7 @@ import { useLanguage } from '@/components/providers/LanguageProvider';
 export const Footer = () => {
   const { t } = useLanguage();
   return (
-    <footer className="bg-[#050507] border-t border-white/10 pt-16 pb-12 text-neutral-400">
+    <footer className="bg-transparent border-t border-white/10 pt-16 pb-12 text-neutral-400">
       <Container size="lg">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-white/10">
           {/* Brand Column */}

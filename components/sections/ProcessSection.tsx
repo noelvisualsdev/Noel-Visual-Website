@@ -9,7 +9,7 @@ import { ProcessStep } from '@/components/shared/ProcessStep';
 
 export const ProcessSection = () => {
   return (
-    <Section id="process" className="bg-[#070709]">
+    <Section id="process" className="bg-transparent">
       <Container size="lg" className="space-y-12">
         <SectionHeader
           badge="OUR METHODOLOGY"

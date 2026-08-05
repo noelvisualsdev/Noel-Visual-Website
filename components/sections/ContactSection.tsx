@@ -10,7 +10,7 @@ import { Mail, MapPin, Clock, ArrowUpRight } from 'lucide-react';
 
 export const ContactSection = () => {
   return (
-    <Section id="contact" className="bg-[#050507] border-t border-white/10">
+    <Section id="contact" className="bg-transparent border-t border-white/10">
       <Container size="lg" className="space-y-12">
         <SectionHeader
           badge="GET IN TOUCH"

@@ -32,10 +32,10 @@ export const metadata: Metadata = {
     siteName: SITE_CONFIG.name,
     images: [
       {
-        url: '/images/featured_edit_city_nights.jpg',
+        url: 'https://noelvisuals.com/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'NOEL VISUALS Showcase',
+        alt: 'NOEL VISUALS — Bringing Ideas to Life',
       },
     ],
   },
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: SITE_CONFIG.name,
     description: SITE_CONFIG.description,
-    images: ['/images/featured_edit_city_nights.jpg'],
+    images: ['https://noelvisuals.com/og-image.png'],
     creator: '@noelvisuals',
   },
   robots: {
