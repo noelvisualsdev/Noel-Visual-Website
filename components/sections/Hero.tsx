@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FeaturedShowreelModal } from '@/components/shared/FeaturedShowreelModal';
 import { ProjectDocument } from '@/lib/projects-db';
 import { AnimatedVideoBackground } from '@/components/ui/AnimatedVideoBackground';
+import { useLanguage } from '@/components/providers/LanguageProvider';
 
 const FALLBACK_HERO_PROJECT: ProjectDocument = {
   id: 'city-nights',
@@ -34,6 +35,7 @@ const FALLBACK_HERO_PROJECT: ProjectDocument = {
 };
 
 export const Hero = () => {
+  const { t } = useLanguage();
   const [projects, setProjects] = useState<ProjectDocument[]>([FALLBACK_HERO_PROJECT]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeModalProject, setActiveModalProject] = useState<any | null>(null);
@@ -75,9 +77,7 @@ export const Hero = () => {
   };
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden bg-[#070709] min-h-[92vh] flex flex-col justify-center">
-      {/* YouTube Animated Background Video (Muted, Auto-looping) */}
-      <AnimatedVideoBackground videoId="9vntypeV5QU" overlayOpacity="bg-black/65" />
+    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden bg-transparent min-h-[92vh] flex flex-col justify-center">
 
       <Container size="lg" className="relative z-10 space-y-16">
         {/* Main Split Grid */}
@@ -94,19 +94,19 @@ export const Hero = () => {
             {/* Giant Title */}
             <div className="space-y-1">
               <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.02] font-sans drop-shadow-2xl">
-                Editing.
+                {t.hero.title1}
                 <br />
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-neutral-200 to-amber-300">
-                  Thumbnails.
+                  {t.hero.title2}
                 </span>
                 <br />
-                Design.
+                {t.hero.title3}
               </h1>
             </div>
 
             {/* Paragraph */}
             <p className="text-sm md:text-base text-neutral-300 max-w-md leading-relaxed backdrop-blur-sm">
-              NOEL VISUALS delivers high-impact video edits, 3D thumbnails, and visual brand identities that command attention in saturated feeds and drive real audience growth.
+              {t.hero.subtitle}
             </p>
 
             {/* Action Buttons */}
@@ -118,7 +118,7 @@ export const Hero = () => {
                 rightIcon={<ArrowRight className="w-4 h-4" />}
                 className="shadow-2xl bg-white text-black font-bold hover:bg-neutral-200"
               >
-                VIEW PORTFOLIO
+                {t.hero.viewPortfolio}
               </Button>
               <Button
                 href="/contact"
@@ -127,7 +127,7 @@ export const Hero = () => {
                 rightIcon={<ArrowRight className="w-4 h-4" />}
                 className="border-white/30 hover:border-white/70 backdrop-blur-md bg-black/40 text-white font-bold"
               >
-                START A PROJECT
+                {t.hero.startProject}
               </Button>
             </div>
 

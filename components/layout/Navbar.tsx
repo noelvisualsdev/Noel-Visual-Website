@@ -6,10 +6,11 @@ import { usePathname } from 'next/navigation';
 import { SITE_CONFIG } from '@/constants/site';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
-import { ArrowRight, Menu, X, LogIn, ShieldAlert, LogOut, LayoutDashboard, ShieldCheck, UserPlus, User, Settings } from 'lucide-react';
+import { ArrowRight, Menu, X, LogIn, ShieldAlert, LogOut, LayoutDashboard, ShieldCheck, UserPlus, User, Settings, Globe } from 'lucide-react';
 import { MobileMenu } from './MobileMenu';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/components/providers/AuthProvider';
+import { useLanguage } from '@/components/providers/LanguageProvider';
 import { AuthModal } from '@/components/shared/AuthModal';
 
 export const Navbar = () => {
@@ -19,6 +20,7 @@ export const Navbar = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const pathname = usePathname();
   const { user, isAuthenticated, loginWithDiscord, logout } = useAuth();
+  const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -97,6 +99,16 @@ export const Navbar = () => {
 
           {/* Action Buttons & Auth */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Language Switcher Toggle */}
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'de' : 'en')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#12141c] border border-white/15 text-neutral-300 hover:text-white hover:border-white/40 transition-all text-xs font-mono font-bold cursor-pointer"
+              title="Switch Language / Sprache wechseln"
+            >
+              <Globe className="w-3.5 h-3.5 text-neutral-400" />
+              <span>{language === 'en' ? 'EN' : 'DE'}</span>
+            </button>
+
             {/* Discord Login Button or User Dropdown */}
             {isAuthenticated && user ? (
               <div className="relative">

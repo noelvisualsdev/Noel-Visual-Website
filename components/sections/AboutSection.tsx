@@ -14,37 +14,37 @@ export const AboutSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-6 space-y-6">
             <SectionHeader
-              badge="WER WIR SIND"
-              title="WIR VERWANDELN IDEEN IN VIDEOS, DIE IM KOPF BLEIBEN."
-              subtitle="NOEL VISUALS ist ein kreatives Studio für hochwertiges Video Editing und visuelle Markenkommunikation. Wir schneiden nicht einfach nur Material – wir formen daraus dynamische Geschichten, die Aufmerksamkeit gewinnen und deine Marke professionell präsentieren."
+              badge="WHO WE ARE"
+              title="WE TURN IDEAS INTO VIDEOS THAT STAY IN PEOPLE'S MINDS."
+              subtitle="NOEL VISUALS is a creative studio specializing in high-quality video editing and visual brand communication. We do not simply cut footage — we transform it into dynamic stories that capture attention and present your brand professionally."
               className="mb-0"
             />
 
             <p className="text-sm text-neutral-300 leading-relaxed">
-              Von Social-Media-Clips bis zu längeren Formaten verbinden wir
-              präzisen Schnitt, Sound Design, Motion Graphics und ein sicheres
-              Gespür für Rhythmus. Dabei arbeiten wir direkt, transparent und
-              zuverlässig – vom ersten Briefing bis zum finalen Export.
+              From social media clips to long-form content, we combine precise
+              editing, sound design, motion graphics, and a strong sense of
+              rhythm. We work directly, transparently, and reliably — from the
+              first briefing to the final export.
             </p>
 
             <div className="grid grid-cols-2 gap-4 pt-4">
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1">
                 <div className="text-2xl font-black font-mono text-white">
-                  350+
+                  150M+
                 </div>
 
                 <div className="text-xs text-neutral-400 font-mono">
-                  Organische Aufrufe generiert
+                  Organic Views Generated
                 </div>
               </div>
 
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1">
                 <div className="text-2xl font-black font-mono text-white">
-                  15+
+                  20+
                 </div>
 
                 <div className="text-xs text-neutral-400 font-mono">
-                  Kreative und Marken betreut
+                  Creators and Brands Served
                 </div>
               </div>
             </div>
@@ -55,12 +55,12 @@ export const AboutSection = () => {
               <Award className="w-8 h-8 text-white" />
 
               <h3 className="text-base font-bold text-white uppercase">
-                Präzises Editing
+                Precise Editing
               </h3>
 
               <p className="text-xs text-neutral-400 leading-relaxed">
-                Jeder Schnitt, jeder Übergang und jedes Detail wird gezielt auf
-                Wirkung und Qualität abgestimmt.
+                Every cut, transition, and detail is carefully refined for
+                maximum impact and quality.
               </p>
             </Card>
 
@@ -68,12 +68,12 @@ export const AboutSection = () => {
               <Sparkles className="w-8 h-8 text-white" />
 
               <h3 className="text-base font-bold text-white uppercase">
-                Story &amp; Retention
+                Story and Retention
               </h3>
 
               <p className="text-xs text-neutral-400 leading-relaxed">
-                Durch klares Storytelling, starkes Timing und dynamische
-                Bildsprache halten wir die Aufmerksamkeit deiner Zuschauer.
+                Clear storytelling, strong pacing, and dynamic visuals keep
+                your audience engaged.
               </p>
             </Card>
 
@@ -81,12 +81,12 @@ export const AboutSection = () => {
               <Users className="w-8 h-8 text-white" />
 
               <h3 className="text-base font-bold text-white uppercase">
-                Direkte Zusammenarbeit
+                Direct Collaboration
               </h3>
 
               <p className="text-xs text-neutral-400 leading-relaxed">
-                Keine unnötigen Umwege: Du arbeitest direkt mit deinem Editor
-                und erhältst schnelle, klare Kommunikation.
+                No unnecessary middlemen. You work directly with your editor
+                and receive fast, clear communication.
               </p>
             </Card>
 
@@ -94,12 +94,12 @@ export const AboutSection = () => {
               <ShieldCheck className="w-8 h-8 text-white" />
 
               <h3 className="text-base font-bold text-white uppercase">
-                Zuverlässige Umsetzung
+                Reliable Delivery
               </h3>
 
               <p className="text-xs text-neutral-400 leading-relaxed">
-                Strukturierte Abläufe, transparente Deadlines und eine
-                termingerechte Lieferung deiner Inhalte.
+                Structured workflows, transparent deadlines, and on-time
+                delivery of your content.
               </p>
             </Card>
           </div>

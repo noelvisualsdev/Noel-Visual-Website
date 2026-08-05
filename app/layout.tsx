@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import '@/app/globals.css';
 import { SITE_CONFIG } from '@/constants/site';
 import { AuthProvider } from '@/components/providers/AuthProvider';
+import { LanguageProvider } from '@/components/providers/LanguageProvider';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://noelvisuals.com'),
@@ -59,7 +60,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark scroll-smooth">
       <body className="bg-[#070709] text-white antialiased selection:bg-white selection:text-black">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );

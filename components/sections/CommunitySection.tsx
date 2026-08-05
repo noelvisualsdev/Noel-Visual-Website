@@ -51,7 +51,7 @@ export const CommunitySection = () => {
           <div className="space-y-3 text-center md:text-left">
             <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-emerald-400">
               <Users className="w-4 h-4" />
-              <span>JOIN 10,000+ CREATORS & EDITORS</span>
+              <span>JOIN THE COMMUNITIY</span>
             </div>
             <h3 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight uppercase">
               NOEL CREATIVE DISCORD & SHADER VAULT

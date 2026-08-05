@@ -1,11 +1,15 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
 import { SITE_CONFIG } from '@/constants/site';
 import { Button } from '@/components/ui/Button';
 import { ArrowUpRight, ArrowUp } from 'lucide-react';
+import { useLanguage } from '@/components/providers/LanguageProvider';
 
 export const Footer = () => {
+  const { t } = useLanguage();
   return (
     <footer className="bg-[#050507] border-t border-white/10 pt-16 pb-12 text-neutral-400">
       <Container size="lg">
@@ -25,7 +29,7 @@ export const Footer = () => {
               </span>
             </Link>
             <p className="text-sm text-neutral-400 max-w-md leading-relaxed">
-              NOEL VISUALS delivers high-impact video edits, high-CTR thumbnails, and strong visual brand systems for creators and brands globally.
+              {t.footer.tagline}
             </p>
           </div>
 
@@ -92,14 +96,14 @@ export const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 gap-4">
-          <p>© {new Date().getFullYear()} NOEL VISUALS. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} NOEL VISUALS. {t.footer.rights}</p>
           <div className="flex items-center gap-6">
             <span>Designed & Engineered for High Performance</span>
             <a
               href="#top"
               className="inline-flex items-center gap-1.5 text-neutral-400 hover:text-white transition-colors"
             >
-              <span>Back to Top</span>
+              <span>{t.footer.backToTop}</span>
               <ArrowUp className="w-3.5 h-3.5" />
             </a>
           </div>
