@@ -11,6 +11,7 @@ export interface ProjectDocument {
   clientId?: string;
   title: string;
   description: string;
+  image?: string;
   images: string[];
   videoUrl?: string;  // Direct video URL (mp4/webm etc.)
   channelId?: string;
@@ -169,6 +170,50 @@ export async function addProject(
   return fileProject;
 }
 
+export async function updateProject(
+  id: string,
+  data: Partial<ProjectDocument>
+): Promise<boolean> {
+  const updateFields: any = { updatedAt: new Date() };
+
+  if (data.title !== undefined) updateFields.title = data.title;
+  if (data.type !== undefined) updateFields.type = data.type;
+  if (data.description !== undefined) updateFields.description = data.description;
+
+  if (data.images && data.images.length > 0) {
+    const savedImages = await Promise.all(
+      data.images.map((img) => saveExternalMediaLocally(img))
+    );
+    updateFields.images = savedImages;
+    updateFields.image = savedImages[0];
+  } else if (data.image) {
+    const savedImg = await saveExternalMediaLocally(data.image);
+    updateFields.images = [savedImg];
+    updateFields.image = savedImg;
+  }
+
+  if (data.videoUrl !== undefined) {
+    updateFields.videoUrl = data.videoUrl ? await saveExternalMediaLocally(data.videoUrl) : '';
+  }
+
+  if (clientPromise) {
+    try {
+      const client = await clientPromise;
+      const db = client.db('noelvisuals');
+      let query: any = { id };
+      if (ObjectId.isValid(id)) {
+        query = { $or: [{ _id: new ObjectId(id) }, { id }] };
+      }
+      const res = await db.collection('projects').updateOne(query, { $set: updateFields });
+      if (res.modifiedCount > 0 || res.matchedCount > 0) return true;
+    } catch (e) {
+      console.warn('[MongoDB] Project update failed:', e);
+    }
+  }
+
+  return false;
+}
+
 export async function deleteProject(id: string): Promise<boolean> {
   if (clientPromise) {
     try {
@@ -186,8 +231,8 @@ export async function deleteProject(id: string): Promise<boolean> {
   }
 
   ensureProjectsFile();
-  const projects = await getProjects();
-  const filtered = projects.filter((p) => p.id !== id && p._id !== id);
-  fs.writeFileSync(filePath, JSON.stringify(filtered, null, 2), 'utf-8');
+  let projects = await getProjects();
+  projects = projects.filter((p) => p.id !== id && p._id !== id);
+  fs.writeFileSync(filePath, JSON.stringify(projects, null, 2), 'utf-8');
   return true;
 }

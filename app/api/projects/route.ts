@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProjects, addProject, deleteProject } from '@/lib/projects-db';
+import { getProjects, addProject, deleteProject, updateProject } from '@/lib/projects-db';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -36,6 +36,35 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true, data: created }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, message: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const id = body.id || body._id;
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, message: 'Project ID is required.' },
+        { status: 400 }
+      );
+    }
+
+    const updated = await updateProject(id, {
+      title: body.title,
+      type: body.type,
+      description: body.description,
+      images: body.images || (body.image ? [body.image] : undefined),
+      videoUrl: body.videoUrl,
+    });
+
+    return NextResponse.json({ success: true, updated }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message },

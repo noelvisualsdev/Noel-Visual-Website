@@ -3,8 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Plus, CheckCircle2, Database, Trash2 } from 'lucide-react';
+import { Plus, CheckCircle2, Database, Trash2, Edit, X, Image as ImageIcon, Film } from 'lucide-react';
 import { ProjectDocument } from '@/lib/projects-db';
+
+const STUDIO_PRESET_IMAGES = [
+  { label: 'City Nights (Editing)', url: '/images/featured_edit_city_nights.jpg' },
+  { label: 'Neon Cyber (Gaming)', url: '/images/featured_edit_neon_cyber.jpg' },
+  { label: 'Thumbnail Art', url: '/images/featured_edit_thumbnail_art.jpg' },
+  { label: 'Brand Identity', url: '/images/featured_edit_brand_identity.jpg' },
+  { label: 'Banner Showcase', url: '/images/og-image.png' },
+];
 
 export default function AdminProjectsPage() {
   const [projects, setProjects] = useState<ProjectDocument[]>([]);
@@ -20,6 +28,15 @@ export default function AdminProjectsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState('');
+
+  // Edit Modal State
+  const [editingProject, setEditingProject] = useState<ProjectDocument | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editType, setEditType] = useState('work');
+  const [editDescription, setEditDescription] = useState('');
+  const [editImage, setEditImage] = useState('');
+  const [editVideoUrl, setEditVideoUrl] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const fetchProjects = () => {
     fetch('/api/projects')
@@ -58,7 +75,7 @@ export default function AdminProjectsPage() {
 
       const data = await res.json();
       if (data.success) {
-        setSuccessMsg('New project document inserted into MongoDB noelvisuals.projects collection!');
+        setSuccessMsg('New project inserted into MongoDB with permanent image saving!');
         setTitle('');
         setDescription('');
         fetchProjects();
@@ -67,6 +84,48 @@ export default function AdminProjectsPage() {
       console.error(err);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const openEditModal = (proj: ProjectDocument) => {
+    setEditingProject(proj);
+    setEditTitle(proj.title || '');
+    setEditType(proj.type || 'work');
+    setEditDescription(proj.description || '');
+    setEditImage(proj.image || proj.images?.[0] || '');
+    setEditVideoUrl(proj.videoUrl || '');
+  };
+
+  const handleUpdateProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProject) return;
+    setIsUpdating(true);
+
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingProject._id || editingProject.id,
+          title: editTitle,
+          type: editType,
+          description: editDescription,
+          image: editImage,
+          images: [editImage],
+          videoUrl: editVideoUrl,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setSuccessMsg(`Projekt "${editTitle}" erfolgreich aktualisiert & Bild gesichert!`);
+        setEditingProject(null);
+        fetchProjects();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -88,60 +147,58 @@ export default function AdminProjectsPage() {
 
   return (
     <div className="space-y-8 max-w-5xl">
-      <div>
-        <div className="flex items-center gap-2">
-          <Database className="w-5 h-5 text-amber-400" />
-          <h1 className="text-2xl font-extrabold text-white uppercase tracking-tight">
-            MONGODB PROJECTS COLLECTION MANAGER
+      {/* Top Header */}
+      <div className="flex items-center justify-between border-b border-white/10 pb-6">
+        <div>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+            <Database className="w-7 h-7 text-amber-400" />
+            Project Management
           </h1>
+          <p className="text-xs text-neutral-400 font-mono mt-1">
+            Manage, edit, add, or delete portfolio projects stored in MongoDBAtlas noelvisuals.projects
+          </p>
         </div>
-        <p className="text-xs font-mono text-neutral-400">
-          Syncing directly with MongoDB Atlas (Database: <code className="text-amber-400">noelvisuals</code> / Collection: <code className="text-amber-400">projects</code>)
-        </p>
       </div>
 
-      {/* Add New Project Document Form */}
-      <Card variant="glass" className="p-8 border-amber-500/30 space-y-6">
+      {/* Insert New Project Form */}
+      <Card variant="glass" className="p-6 space-y-6 border-white/10">
         <h2 className="text-lg font-bold text-white uppercase flex items-center gap-2">
-          <Plus className="w-5 h-5 text-amber-400" /> ADD MONGODB PROJECT ({`{ type, clientId, title, description, images, channelId }`})
+          <Plus className="w-5 h-5 text-amber-400" />
+          Add New Project to Website
         </h2>
 
         <form onSubmit={handleAddProject} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1">
+              <label className="text-xs font-mono uppercase text-neutral-300 block">Type / Category</label>
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-white/10 text-white font-mono text-xs"
+              >
+                <option value="work">work (General)</option>
+                <option value="Editing">Editing (Video)</option>
+                <option value="Thumbnails">Thumbnails (3D)</option>
+                <option value="Graphic Design">Graphic Design</option>
+                <option value="UI/UX Design">UI/UX Design</option>
+                <option value="Bot">Bot (Discord)</option>
+              </select>
+            </div>
+            <div className="space-y-1 md:col-span-2">
               <label className="text-xs font-mono uppercase text-neutral-300 block">Project Title *</label>
               <input
                 type="text"
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-white/10 text-white font-bold text-xs"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-mono uppercase text-neutral-300 block">type (e.g. work, Editing)</label>
-              <input
-                type="text"
-                required
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-white/10 text-amber-300 font-mono text-xs"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-mono uppercase text-neutral-300 block">clientId</label>
-              <input
-                type="text"
-                value={clientId}
-                onChange={(e) => setClientId(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-white/10 text-neutral-300 font-mono text-xs"
+                className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-white/10 text-white font-mono text-xs"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-xs font-mono uppercase text-neutral-300 block">Image URL (Vorschaubild)</label>
+              <label className="text-xs font-mono uppercase text-neutral-300 block">Image URL / File</label>
               <input
                 type="text"
                 value={imageUrl}
@@ -151,7 +208,7 @@ export default function AdminProjectsPage() {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-mono uppercase text-neutral-300 block">🎬 Video URL (direkt, kein YouTube)</label>
+              <label className="text-xs font-mono uppercase text-neutral-300 block">🎬 Video URL (mp4/webm)</label>
               <input
                 type="text"
                 value={videoUrl}
@@ -192,36 +249,64 @@ export default function AdminProjectsPage() {
         </form>
       </Card>
 
-      {/* Live MongoDB Projects */}
+      {/* Live MongoDB Projects Grid */}
       <div className="space-y-4">
         <h2 className="text-lg font-bold text-white uppercase">
-          DOCUMENTS IN COLLECTION noelvisuals.projects ({projects.length})
+          LIVE PROJECTS IN COLLECTION noelvisuals.projects ({projects.length})
         </h2>
 
         {projects.length === 0 ? (
           <div className="p-6 rounded-xl bg-white/5 border border-white/10 text-center text-xs text-neutral-400 font-mono">
-            No documents in MongoDB <code className="text-amber-400">noelvisuals.projects</code> yet. Fill out the form above to add your first project!
+            No projects in MongoDB. Add a project above!
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {projects.map((proj, idx) => {
               const projId = proj._id || proj.id || String(idx);
+              const previewImg = proj.image || proj.images?.[0] || '/images/featured_edit_city_nights.jpg';
+
               return (
-                <Card key={projId} variant="glass" className="p-5 space-y-3 border-white/10 relative">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-white uppercase text-sm">{proj.title}</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-400/10 text-amber-300 border border-amber-400/20">
-                      type: {proj.type}
-                    </span>
+                <Card key={projId} variant="glass" className="p-5 space-y-4 border-white/10 relative overflow-hidden flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-black border border-white/15 shrink-0">
+                          <img src={previewImg} alt="" className="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-white uppercase text-sm">{proj.title}</h3>
+                          <span className="text-[10px] font-mono text-amber-300 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20 uppercase">
+                            {proj.type}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Edit Button */}
+                      <button
+                        onClick={() => openEditModal(proj)}
+                        className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors flex items-center gap-1 text-xs font-mono border border-white/20 cursor-pointer"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                        <span>EDIT / BILD</span>
+                      </button>
+                    </div>
+
+                    <p className="text-xs text-neutral-300 line-clamp-2 leading-relaxed">{proj.description}</p>
+                    
+                    {proj.videoUrl && (
+                      <div className="text-[10px] font-mono text-amber-400 bg-amber-950/40 p-2 rounded border border-amber-500/20 truncate flex items-center gap-1.5">
+                        <Film className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{proj.videoUrl}</span>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-xs text-neutral-300 line-clamp-2 leading-relaxed">{proj.description}</p>
-                  
+
                   <div className="text-[10px] font-mono text-neutral-400 border-t border-white/5 pt-3 flex items-center justify-between">
-                    <span>clientId: {proj.clientId}</span>
+                    <span className="truncate max-w-[200px]">Img: {previewImg}</span>
                     <button
                       onClick={() => handleDeleteProject(projId)}
                       disabled={deletingId === projId}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white font-bold text-xs transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white font-bold text-xs transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       <span>{deletingId === projId ? 'LÖSCHEN...' : 'LÖSCHEN'}</span>
@@ -233,6 +318,130 @@ export default function AdminProjectsPage() {
           </div>
         )}
       </div>
+
+      {/* EDIT PROJECT MODAL */}
+      {editingProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="bg-[#0e0e12] border border-white/20 rounded-2xl p-6 md:p-8 max-w-2xl w-full space-y-6 shadow-2xl relative">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <h3 className="text-lg font-bold text-white uppercase flex items-center gap-2">
+                <Edit className="w-5 h-5 text-amber-400" />
+                Projekt & Bild Bearbeiten
+              </h3>
+              <button
+                onClick={() => setEditingProject(null)}
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateProject} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-mono uppercase text-neutral-300 block">Kategorie / Type</label>
+                  <select
+                    value={editType}
+                    onChange={(e) => setEditType(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-white/10 text-white font-mono text-xs"
+                  >
+                    <option value="work">work (General)</option>
+                    <option value="Editing">Editing (Video)</option>
+                    <option value="Thumbnails">Thumbnails (3D)</option>
+                    <option value="Graphic Design">Graphic Design</option>
+                    <option value="UI/UX Design">UI/UX Design</option>
+                    <option value="Bot">Bot (Discord)</option>
+                  </select>
+                </div>
+                <div className="space-y-1 md:col-span-2">
+                  <label className="text-xs font-mono uppercase text-neutral-300 block">Titel *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-white/10 text-white font-mono text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Image Input & Studio Presets */}
+              <div className="space-y-2">
+                <label className="text-xs font-mono uppercase text-neutral-300 flex items-center gap-1.5">
+                  <ImageIcon className="w-4 h-4 text-amber-400" />
+                  <span>Bild-URL oder Pfad eingeben</span>
+                </label>
+                <input
+                  type="text"
+                  value={editImage}
+                  onChange={(e) => setEditImage(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-white/10 text-white font-mono text-xs"
+                  placeholder="https://... oder /images/... oder /uploads/..."
+                />
+                
+                {/* Presets */}
+                <div className="space-y-1 pt-1">
+                  <span className="text-[10px] font-mono text-neutral-400 block">Studio-Vorlagen auswählen:</span>
+                  <div className="flex flex-wrap gap-2">
+                    {STUDIO_PRESET_IMAGES.map((preset) => (
+                      <button
+                        key={preset.url}
+                        type="button"
+                        onClick={() => setEditImage(preset.url)}
+                        className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/15 text-[10px] font-mono text-neutral-300 border border-white/10 transition-colors"
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Video URL Input */}
+              <div className="space-y-1">
+                <label className="text-xs font-mono uppercase text-neutral-300 flex items-center gap-1.5">
+                  <Film className="w-4 h-4 text-amber-400" />
+                  <span>🎬 Video URL (MP4 / WebM Link)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editVideoUrl}
+                  onChange={(e) => setEditVideoUrl(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-amber-500/30 text-amber-300 font-mono text-xs"
+                  placeholder="https://cdn.example.com/video.mp4"
+                />
+              </div>
+
+              {/* Description */}
+              <div className="space-y-1">
+                <label className="text-xs font-mono uppercase text-neutral-300 block">Beschreibung *</label>
+                <textarea
+                  rows={3}
+                  required
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg bg-black/60 border border-white/10 text-white text-xs resize-none font-sans"
+                />
+              </div>
+
+              <div className="pt-4 flex items-center justify-end gap-3 border-t border-white/10">
+                <Button type="button" variant="ghost" size="sm" onClick={() => setEditingProject(null)}>
+                  Abbrechen
+                </Button>
+                <Button
+                  type="submit"
+                  variant="glow"
+                  size="sm"
+                  isLoading={isUpdating}
+                  className="bg-amber-400 text-black font-extrabold hover:bg-amber-300"
+                >
+                  SPEICHERN & BILD BINDEN
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
