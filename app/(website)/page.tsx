@@ -5,6 +5,7 @@ import { ServicesSection } from '@/components/sections/ServicesSection';
 import { AboutSection } from '@/components/sections/AboutSection';
 import { ProcessSection } from '@/components/sections/ProcessSection';
 import { ReviewsSection } from '@/components/sections/ReviewsSection';
+import { PartnersSection } from '@/components/sections/PartnersSection';
 import { CommunitySection } from '@/components/sections/CommunitySection';
 import { FAQSection } from '@/components/sections/FAQSection';
 import { ContactSection } from '@/components/sections/ContactSection';
@@ -17,6 +18,7 @@ export default function HomePage() {
       <ServicesSection previewOnly={true} />
       <AboutSection />
       <ProcessSection />
+      <PartnersSection />
       <ReviewsSection />
       <CommunitySection />
       <FAQSection />

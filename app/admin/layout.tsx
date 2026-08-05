@@ -17,6 +17,7 @@ import {
   Gift,
   KeyRound,
   Layers,
+  Handshake,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
@@ -200,6 +201,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <Gift className="w-4 h-4" />
               <span>MongoDB Giveaways</span>
+            </Link>
+
+            <Link
+              href="/admin/partners"
+              className={cn(
+                'flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-colors',
+                pathname === '/admin/partners'
+                  ? 'bg-amber-400/10 text-amber-300 font-bold border border-amber-400/30'
+                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
+              )}
+            >
+              <Handshake className="w-4 h-4" />
+              <span>Partner</span>
             </Link>
 
             <Link
