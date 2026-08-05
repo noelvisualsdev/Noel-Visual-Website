@@ -87,11 +87,11 @@ export default function ImpressumPage() {
               <div>
                 <span className="text-xs font-mono text-neutral-400 block uppercase">Telefon</span>
                 <a
-                  href="tel:+49782234135"
+                  href="tel:+41782234135"
                   className="text-white hover:underline flex items-center gap-2 pt-1 font-mono text-xs sm:text-sm"
                 >
                   <Phone className="w-4 h-4 text-neutral-400" />
-                  +49 78 223 41 35
+                  +41 78 223 41 35
                 </a>
               </div>
             </div>

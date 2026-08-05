@@ -24,6 +24,7 @@ import { FeaturedShowreelModal } from '@/components/shared/FeaturedShowreelModal
 import { ProjectDocument } from '@/lib/projects-db';
 import { AnimatedVideoBackground } from '@/components/ui/AnimatedVideoBackground';
 import { useLanguage } from '@/components/providers/LanguageProvider';
+import { cn } from '@/lib/utils';
 
 const FALLBACK_HERO_PROJECT: ProjectDocument = {
   id: 'city-nights',
@@ -204,19 +205,33 @@ export const Hero = () => {
                     </div>
 
                     {/* Card Inner Content */}
-                    <div className="absolute inset-0 p-6 sm:p-8 flex flex-col justify-between z-20">
+                    <div className="absolute inset-0 p-4 sm:p-6 md:p-8 flex flex-col justify-between z-20 pointer-events-none">
+                      {/* Top Category Badge */}
+                      <div className="flex items-center justify-between pointer-events-auto">
+                        <span className="text-[10px] font-mono uppercase tracking-widest bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-white border border-white/20">
+                          {activeProject.type || activeProject.category || 'FEATURED WORK'}
+                        </span>
+                      </div>
+
                       {/* Middle Title Block */}
-                      <div className="space-y-1">
-                        <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white uppercase drop-shadow-md">
+                      <div className="space-y-1 my-auto pointer-events-auto">
+                        <h2 className={cn(
+                          "font-extrabold tracking-tight text-white uppercase drop-shadow-lg line-clamp-2 leading-tight",
+                          (activeProject.title || '').length > 35
+                            ? "text-lg sm:text-xl md:text-2xl lg:text-3xl"
+                            : (activeProject.title || '').length > 20
+                            ? "text-xl sm:text-2xl md:text-3xl lg:text-4xl"
+                            : "text-2xl sm:text-4xl md:text-5xl"
+                        )}>
                           {activeProject.title}
                         </h2>
-                        <p className="text-xs sm:text-sm font-mono text-neutral-300 uppercase tracking-widest pt-1">
-                          {activeProject.description.slice(0, 75)}...
+                        <p className="text-xs sm:text-sm font-mono text-neutral-300 uppercase tracking-widest pt-1 line-clamp-2">
+                          {activeProject.description || ''}
                         </p>
                       </div>
 
                       {/* Bottom Controls Row */}
-                      <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/10">
+                      <div className="flex items-center justify-between gap-4 pt-3 border-t border-white/10 pointer-events-auto z-30">
                         {/* Play Showreel Button */}
                         <button
                           onClick={() => {
@@ -240,7 +255,7 @@ export const Hero = () => {
                           <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center group-hover/btn:scale-110 transition-transform">
                             <Play className="w-3.5 h-3.5 fill-black translate-x-0.5" />
                           </div>
-                          <span>WATCH PROJECT</span>
+                          <span>{t.hero.watchProject}</span>
                         </button>
 
                         {/* Pagination Counter & Navigation */}
@@ -251,13 +266,15 @@ export const Hero = () => {
                           <div className="flex items-center gap-1">
                             <button
                               onClick={handlePrev}
-                              className="p-2 rounded-md bg-black/70 border border-white/20 text-neutral-300 hover:text-white hover:border-white/50 transition-colors"
+                              className="p-2 rounded-md bg-black/80 border border-white/20 text-neutral-300 hover:text-white hover:border-white/50 transition-colors cursor-pointer hover:scale-105 active:scale-95"
+                              title="Previous Project"
                             >
                               <ChevronLeft className="w-4 h-4" />
                             </button>
                             <button
                               onClick={handleNext}
-                              className="p-2 rounded-md bg-black/70 border border-white/20 text-neutral-300 hover:text-white hover:border-white/50 transition-colors"
+                              className="p-2 rounded-md bg-black/80 border border-white/20 text-neutral-300 hover:text-white hover:border-white/50 transition-colors cursor-pointer hover:scale-105 active:scale-95"
+                              title="Next Project"
                             >
                               <ChevronRight className="w-4 h-4" />
                             </button>
