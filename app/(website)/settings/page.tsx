@@ -47,7 +47,6 @@ export default function SettingsPage() {
     setErrorMsg('');
 
     try {
-      // Simulate/save settings
       await new Promise((r) => setTimeout(r, 600));
       setSuccessMsg('Settings saved successfully!');
       setTimeout(() => setSuccessMsg(''), 4000);
@@ -68,7 +67,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#07080a] text-white pt-28 pb-20 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#050505] text-white pt-28 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Header Bar */}
@@ -84,7 +83,7 @@ export default function SettingsPage() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
 
           {/* Left Sidebar Navigation */}
-          <div className="md:col-span-4 lg:col-span-3 bg-[#101217] border border-[#20232d] rounded-2xl p-2.5 space-y-1 shadow-xl">
+          <div className="md:col-span-4 lg:col-span-3 bg-[#0e0e11] border border-[#1f1f24] rounded-2xl p-2.5 space-y-1 shadow-xl">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -98,7 +97,7 @@ export default function SettingsPage() {
                   }}
                   className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-xl font-medium text-xs transition-all relative ${
                     isActive
-                      ? 'bg-[#1a1d26] text-white shadow-md'
+                      ? 'bg-[#1a1a1f] text-white shadow-md'
                       : 'text-neutral-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
@@ -117,7 +116,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Right Main Content Panel */}
-          <div className="md:col-span-8 lg:col-span-9 bg-[#101217] border border-[#20232d] rounded-2xl p-6 sm:p-8 shadow-xl min-h-[480px]">
+          <div className="md:col-span-8 lg:col-span-9 bg-[#0e0e11] border border-[#1f1f24] rounded-2xl p-6 sm:p-8 shadow-xl min-h-[480px]">
             
             {/* Feedback Alerts */}
             {successMsg && (
@@ -147,7 +146,7 @@ export default function SettingsPage() {
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-[#171a22] border border-[#2a2e3b] text-white text-xs focus:outline-none focus:border-white/40 transition-colors"
+                      className="w-full px-4 py-3 rounded-xl bg-[#151519] border border-[#25252b] text-white text-xs focus:outline-none focus:border-white/50 transition-colors"
                     />
                   </div>
 
@@ -157,7 +156,7 @@ export default function SettingsPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-[#171a22] border border-[#2a2e3b] text-white text-xs focus:outline-none focus:border-white/40 transition-colors"
+                      className="w-full px-4 py-3 rounded-xl bg-[#151519] border border-[#25252b] text-white text-xs focus:outline-none focus:border-white/50 transition-colors"
                     />
                   </div>
 
@@ -167,7 +166,7 @@ export default function SettingsPage() {
                       <select
                         value={language}
                         onChange={(e) => setLanguage(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-[#171a22] border border-[#2a2e3b] text-white text-xs appearance-none focus:outline-none focus:border-white/40 transition-colors pr-10 cursor-pointer"
+                        className="w-full px-4 py-3 rounded-xl bg-[#151519] border border-[#25252b] text-white text-xs appearance-none focus:outline-none focus:border-white/50 transition-colors pr-10 cursor-pointer"
                       >
                         <option value="English">English</option>
                         <option value="German">Deutsch (German)</option>
@@ -183,7 +182,7 @@ export default function SettingsPage() {
                       <select
                         value={timezone}
                         onChange={(e) => setTimezone(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-[#171a22] border border-[#2a2e3b] text-white text-xs appearance-none focus:outline-none focus:border-white/40 transition-colors pr-10 cursor-pointer"
+                        className="w-full px-4 py-3 rounded-xl bg-[#151519] border border-[#25252b] text-white text-xs appearance-none focus:outline-none focus:border-white/50 transition-colors pr-10 cursor-pointer"
                       >
                         <option value="(UTC+1) Berlin, Germany">(UTC+1) Berlin, Germany</option>
                         <option value="(UTC+0) London, UK">(UTC+0) London, UK</option>
@@ -239,7 +238,7 @@ export default function SettingsPage() {
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-[#171a22] border border-[#2a2e3b] text-white text-xs focus:outline-none focus:border-white/40 transition-colors"
+                      className="w-full px-4 py-3 rounded-xl bg-[#151519] border border-[#25252b] text-white text-xs focus:outline-none focus:border-white/50 transition-colors"
                     />
                   </div>
 
@@ -249,7 +248,7 @@ export default function SettingsPage() {
                       rows={3}
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-[#171a22] border border-[#2a2e3b] text-white text-xs focus:outline-none focus:border-white/40 transition-colors resize-none"
+                      className="w-full px-4 py-3 rounded-xl bg-[#151519] border border-[#25252b] text-white text-xs focus:outline-none focus:border-white/50 transition-colors resize-none"
                     />
                   </div>
                 </div>
@@ -282,7 +281,7 @@ export default function SettingsPage() {
                       placeholder="••••••••••••"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-[#171a22] border border-[#2a2e3b] text-white text-xs focus:outline-none focus:border-white/40 transition-colors"
+                      className="w-full px-4 py-3 rounded-xl bg-[#151519] border border-[#25252b] text-white text-xs focus:outline-none focus:border-white/50 transition-colors"
                     />
                   </div>
 
@@ -293,7 +292,7 @@ export default function SettingsPage() {
                       placeholder="••••••••••••"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-[#171a22] border border-[#2a2e3b] text-white text-xs focus:outline-none focus:border-white/40 transition-colors"
+                      className="w-full px-4 py-3 rounded-xl bg-[#151519] border border-[#25252b] text-white text-xs focus:outline-none focus:border-white/50 transition-colors"
                     />
                   </div>
 
@@ -304,7 +303,7 @@ export default function SettingsPage() {
                       placeholder="••••••••••••"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-[#171a22] border border-[#2a2e3b] text-white text-xs focus:outline-none focus:border-white/40 transition-colors"
+                      className="w-full px-4 py-3 rounded-xl bg-[#151519] border border-[#25252b] text-white text-xs focus:outline-none focus:border-white/50 transition-colors"
                     />
                   </div>
                 </div>
@@ -330,7 +329,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-4 pt-2">
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-[#171a22] border border-[#2a2e3b]">
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-[#151519] border border-[#25252b]">
                     <div>
                       <h3 className="text-xs font-semibold text-white">Email Notifications</h3>
                       <p className="text-[11px] text-neutral-400">Receive important updates regarding your account.</p>
@@ -339,11 +338,11 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={emailNotifs}
                       onChange={(e) => setEmailNotifs(e.target.checked)}
-                      className="w-4 h-4 rounded bg-black border-[#2a2e3b] accent-white cursor-pointer"
+                      className="w-4 h-4 rounded bg-black border-[#25252b] accent-white cursor-pointer"
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-[#171a22] border border-[#2a2e3b]">
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-[#151519] border border-[#25252b]">
                     <div>
                       <h3 className="text-xs font-semibold text-white">Order & Brief Updates</h3>
                       <p className="text-[11px] text-neutral-400">Get notified when project briefs are completed or updated.</p>
@@ -352,11 +351,11 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={orderUpdates}
                       onChange={(e) => setOrderUpdates(e.target.checked)}
-                      className="w-4 h-4 rounded bg-black border-[#2a2e3b] accent-white cursor-pointer"
+                      className="w-4 h-4 rounded bg-black border-[#25252b] accent-white cursor-pointer"
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-[#171a22] border border-[#2a2e3b]">
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-[#151519] border border-[#25252b]">
                     <div>
                       <h3 className="text-xs font-semibold text-white">News & Features</h3>
                       <p className="text-[11px] text-neutral-400">Occasional updates about new services and showreels.</p>
@@ -365,7 +364,7 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={marketing}
                       onChange={(e) => setMarketing(e.target.checked)}
-                      className="w-4 h-4 rounded bg-black border-[#2a2e3b] accent-white cursor-pointer"
+                      className="w-4 h-4 rounded bg-black border-[#25252b] accent-white cursor-pointer"
                     />
                   </div>
                 </div>
@@ -390,7 +389,7 @@ export default function SettingsPage() {
                   <p className="text-xs text-neutral-400 mt-1">View payment confirmations and invoice receipts.</p>
                 </div>
 
-                <div className="p-6 rounded-xl bg-[#171a22] border border-[#2a2e3b] text-center space-y-2">
+                <div className="p-6 rounded-xl bg-[#151519] border border-[#25252b] text-center space-y-2">
                   <CreditCard className="w-8 h-8 text-neutral-400 mx-auto" />
                   <h3 className="text-xs font-semibold text-white">No active payment methods saved</h3>
                   <p className="text-[11px] text-neutral-400 max-w-sm mx-auto">
@@ -415,8 +414,8 @@ export default function SettingsPage() {
                       onClick={() => { setLanguage(lang); setSuccessMsg(`Language set to ${lang}`); }}
                       className={`w-full p-4 rounded-xl border flex items-center justify-between text-xs font-medium transition-all ${
                         language === lang
-                          ? 'bg-[#171a22] border-white text-white font-semibold'
-                          : 'bg-[#171a22]/50 border-[#2a2e3b] text-neutral-400 hover:text-white'
+                          ? 'bg-[#151519] border-white text-white font-semibold'
+                          : 'bg-[#151519]/50 border-[#25252b] text-neutral-400 hover:text-white'
                       }`}
                     >
                       <span>{lang}</span>
