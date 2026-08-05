@@ -5,6 +5,7 @@ export interface Project {
   category: 'Editing' | 'Thumbnails' | 'Graphic Design' | 'Brand Identity' | 'VFX';
   client: string;
   image: string;
+  images?: string[];
   videoUrl?: string;
   duration?: string;
   views?: string;

@@ -20,6 +20,7 @@ export const FeaturedShowreelModal = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.5); // Start at 50% volume
+  const [imgError, setImgError] = useState(false);
 
   if (!project) return null;
 
@@ -27,8 +28,13 @@ export const FeaturedShowreelModal = ({
     ? project.deliverables
     : ['4K Master Export', 'Custom Color Grade', 'PSD Source Files', 'High CTR Render'];
 
-  const projectImage = project.image || project.images?.[0] || '/images/featured_edit_city_nights.jpg';
-  const videoUrl = project.videoUrl || project.video || null;
+  const rawImage = project.image || project.images?.[0] || '';
+  const isVideo = (url: string) =>
+    Boolean(url && /\.(mp4|mov|webm|avi|mkv)(\?|$)/i.test(url.toLowerCase()));
+
+  const effectiveVideoUrl = project.videoUrl || project.video || (isVideo(rawImage) ? rawImage : null);
+  const fallbackImage = '/images/featured_edit_city_nights.jpg';
+  const posterImage = (rawImage && !isVideo(rawImage) && !imgError) ? rawImage : fallbackImage;
 
   const togglePlay = () => {
     if (!videoRef.current) return;
@@ -57,7 +63,6 @@ export const FeaturedShowreelModal = ({
   };
 
   const handleVideoLoad = () => {
-    // Set initial volume when video loads
     if (videoRef.current) {
       videoRef.current.volume = volume;
     }
@@ -78,7 +83,7 @@ export const FeaturedShowreelModal = ({
             <div className="flex items-center gap-3">
               <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
               <span className="text-xs font-mono uppercase tracking-widest text-neutral-300">
-                {videoUrl ? '▶ VIDEO PLAYBACK' : 'FEATURED SHOWREEL'} • {project.category || project.type || 'WORK'}
+                {effectiveVideoUrl ? '▶ VIDEO PLAYBACK' : 'FEATURED SHOWREEL'} • {project.category || project.type || 'WORK'}
               </span>
             </div>
             <button
@@ -92,19 +97,19 @@ export const FeaturedShowreelModal = ({
           <div className="overflow-y-auto p-6 md:p-8 space-y-6">
             {/* Video or Image Preview */}
             <div className="relative aspect-video rounded-xl overflow-hidden border border-white/15 bg-black group">
-              {videoUrl ? (
+              {effectiveVideoUrl ? (
                 <>
                   <video
                     ref={videoRef}
-                    src={videoUrl}
+                    src={effectiveVideoUrl}
                     className="w-full h-full object-cover"
                     playsInline
                     onEnded={() => setIsPlaying(false)}
                     onLoadedMetadata={handleVideoLoad}
-                    poster={projectImage}
+                    poster={posterImage}
                   />
                   {/* Video Controls Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4 z-20">
                     <div className="flex items-center gap-3">
                       {/* Play/Pause */}
                       <button
@@ -152,7 +157,7 @@ export const FeaturedShowreelModal = ({
                   {/* Big play button when not playing */}
                   {!isPlaying && (
                     <div
-                      className="absolute inset-0 flex items-center justify-center cursor-pointer"
+                      className="absolute inset-0 flex items-center justify-center cursor-pointer z-10"
                       onClick={togglePlay}
                     >
                       <div className="w-20 h-20 rounded-full bg-white/90 text-black flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
@@ -164,10 +169,11 @@ export const FeaturedShowreelModal = ({
               ) : (
                 <>
                   <Image
-                    src={projectImage}
+                    src={posterImage}
                     alt={project.title || 'Project'}
                     fill
-                    unoptimized={projectImage?.startsWith('http')}
+                    unoptimized={posterImage.startsWith('http')}
+                    onError={() => setImgError(true)}
                     className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
@@ -234,8 +240,9 @@ export const FeaturedShowreelModal = ({
                 href="/contact"
                 variant="glow"
                 size="sm"
-                rightIcon={<ArrowRight className="w-4 h-4" />}
+                rightIcon={<ArrowRight className="w-4 h-4 text-black" />}
                 onClick={onClose}
+                className="bg-white text-black font-extrabold"
               >
                 REQUEST SIMILAR PROJECT
               </Button>
