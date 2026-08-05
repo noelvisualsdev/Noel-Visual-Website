@@ -12,6 +12,7 @@ export const SITE_CONFIG = {
     { label: 'ABOUT', href: '/about' },
     { label: 'PROCESS', href: '/process' },
     { label: 'REVIEWS', href: '/reviews' },
+    { label: 'PARTNER', href: '/partner' },
     { label: 'CONTACT', href: '/contact' },
   ],
   socials: {
