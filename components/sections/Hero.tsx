@@ -196,14 +196,23 @@ export const Hero = () => {
                       <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/10">
                         {/* Play Showreel Button */}
                         <button
-                          onClick={() => setActiveModalProject({
-                            title: activeProject.title,
-                            subtitle: activeProject.type,
-                            category: activeProject.type,
-                            image: projectImage,
-                            description: activeProject.description,
-                          })}
-                          className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/30 hover:border-white/70 text-white text-xs font-mono tracking-widest uppercase transition-all group/btn hover:bg-white/20"
+                          onClick={() => {
+                            const allUrls = activeProject.images || [];
+                            const detectedVideo = activeProject.videoUrl || allUrls.find(u => /\.(mp4|mov|webm|avi|mkv)(\?|$)/i.test(u)) || (activeProject as any).video || undefined;
+                            const thumbnail = allUrls.find(u => !/\.(mp4|mov|webm|avi|mkv)(\?|$)/i.test(u)) || allUrls[0] || '/images/featured_edit_city_nights.jpg';
+
+                            setActiveModalProject({
+                              ...activeProject,
+                              title: activeProject.title,
+                              subtitle: activeProject.subtitle || activeProject.type,
+                              category: activeProject.type,
+                              image: thumbnail,
+                              images: activeProject.images,
+                              videoUrl: detectedVideo,
+                              description: activeProject.description,
+                            });
+                          }}
+                          className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/30 hover:border-white/70 text-white text-xs font-mono tracking-widest uppercase transition-all group/btn hover:bg-white/20 cursor-pointer"
                         >
                           <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center group-hover/btn:scale-110 transition-transform">
                             <Play className="w-3.5 h-3.5 fill-black translate-x-0.5" />
