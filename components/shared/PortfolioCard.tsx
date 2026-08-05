@@ -15,6 +15,7 @@ interface PortfolioCardProps {
 export const PortfolioCard = ({ project, onOpenModal }: PortfolioCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   const rawImage = project.image || project.images?.[0] || '';
   const isVideo = (url: string) =>
@@ -35,13 +36,14 @@ export const PortfolioCard = ({ project, onOpenModal }: PortfolioCardProps) => {
     >
       {/* Container */}
       <div className="relative aspect-video w-full overflow-hidden bg-neutral-900">
-        {showVideoPreview ? (
+        {showVideoPreview && !videoError ? (
           <video
             src={videoPreviewSrc}
             muted
             loop
             playsInline
             autoPlay
+            onError={() => setVideoError(true)}
             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
         ) : (

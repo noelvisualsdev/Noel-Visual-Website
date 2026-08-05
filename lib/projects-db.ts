@@ -40,19 +40,26 @@ export async function getProjects(): Promise<ProjectDocument[]> {
       const docs = await db.collection('projects').find({}).sort({ _id: -1 }).toArray();
       if (docs && docs.length > 0) {
         return docs.map((doc) => {
-          const allUrls: string[] = Array.isArray(doc.images) ? doc.images : [];
+          let allUrls: string[] = [];
+          if (Array.isArray(doc.images)) {
+            allUrls = doc.images;
+          } else if (typeof doc.images === 'string' && doc.images.trim()) {
+            allUrls = [doc.images.trim()];
+          } else if (typeof doc.image === 'string' && doc.image.trim()) {
+            allUrls = [doc.image.trim()];
+          }
 
           // Auto-detect: separate video URLs from image URLs
           const isVideoUrl = (url: string) =>
-            /\.(mp4|mov|webm|avi|mkv)(\?|$)/i.test(url);
+            Boolean(url && /\.(mp4|mov|webm|avi|mkv)(\?|$)/i.test(url.toLowerCase()));
 
           const imageUrls = allUrls.filter(u => !isVideoUrl(u));
           const videoUrls = allUrls.filter(u => isVideoUrl(u));
 
           // Use explicit videoUrl field OR first detected video URL
-          const videoUrl = doc.videoUrl || videoUrls[0] || '';
-          // Thumbnail = explicit image OR first image URL
-          const thumbnail = imageUrls[0] || '/images/featured_edit_city_nights.jpg';
+          const videoUrl = doc.videoUrl || doc.video || videoUrls[0] || undefined;
+          // Thumbnail = explicit image OR first image URL OR fallback
+          const thumbnail = imageUrls[0] || (allUrls.length > 0 ? allUrls[0] : '/images/featured_edit_city_nights.jpg');
 
           return {
             _id: doc._id.toString(),
@@ -61,8 +68,9 @@ export async function getProjects(): Promise<ProjectDocument[]> {
             clientId: doc.clientId ? String(doc.clientId) : '',
             title: String(doc.title || 'Untitled Project'),
             description: String(doc.description || ''),
-            images: imageUrls.length > 0 ? imageUrls : ['/images/featured_edit_city_nights.jpg'],
-            videoUrl: videoUrl || undefined,
+            image: thumbnail,
+            images: imageUrls.length > 0 ? imageUrls : [thumbnail],
+            videoUrl: videoUrl,
             channelId: doc.channelId ? String(doc.channelId) : '',
             createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
             subtitle: String(doc.type || 'WORK SHOWCASE').toUpperCase(),
