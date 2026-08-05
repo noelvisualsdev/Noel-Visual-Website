@@ -1,4 +1,9 @@
+@import url('https://fonts.cdnfonts.com/css/neuropol');
 @import "tailwindcss";
+
+.font-neuropol {
+  font-family: 'Neuropol', 'Neuropol X', 'Orbitron', system-ui, sans-serif;
+}
 
 @layer base {
   :root {
