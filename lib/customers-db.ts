@@ -31,13 +31,22 @@ function ensureCustomersFile() {
 }
 
 export async function findCustomerByEmail(email: string): Promise<CustomerDocument | null> {
-  const normalizedEmail = email.toLowerCase().trim();
+  return findCustomerByEmailOrUsername(email);
+}
+
+export async function findCustomerByEmailOrUsername(identifier: string): Promise<CustomerDocument | null> {
+  const normalized = identifier.toLowerCase().trim();
 
   if (clientPromise) {
     try {
       const client = await clientPromise;
       const db = client.db('noelvisuals');
-      const doc = await db.collection('customers').findOne({ email: normalizedEmail });
+      const doc = await db.collection('customers').findOne({
+        $or: [
+          { email: normalized },
+          { username: { $regex: new RegExp(`^${normalized}$`, 'i') } }
+        ]
+      });
       if (doc) {
         return {
           _id: doc._id.toString(),
@@ -64,7 +73,9 @@ export async function findCustomerByEmail(email: string): Promise<CustomerDocume
   try {
     const data = fs.readFileSync(filePath, 'utf-8');
     const customers: CustomerDocument[] = JSON.parse(data);
-    return customers.find((c) => c.email.toLowerCase() === normalizedEmail) || null;
+    return customers.find(
+      (c) => c.email.toLowerCase() === normalized || c.username.toLowerCase() === normalized
+    ) || null;
   } catch (e) {
     return null;
   }

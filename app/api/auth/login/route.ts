@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { findCustomerByEmail } from '@/lib/customers-db';
+import { findCustomerByEmailOrUsername } from '@/lib/customers-db';
 import { recordUserSession } from '@/lib/sessions-db';
 import { checkDiscordUserAdminRole } from '@/lib/discord';
 
@@ -8,19 +8,20 @@ const OWNER_DISCORD_ID = '1208827674185957447';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const identifier = (body.loginEmail || body.email || body.identifier || '').trim();
+    const password = (body.loginPassword || body.password || '').trim();
 
-    if (!email || !password) {
+    if (!identifier || !password) {
       return NextResponse.json(
-        { success: false, message: 'Bitte E-Mail-Adresse und Passwort eingeben.' },
+        { success: false, message: 'Bitte E-Mail-Adresse / Benutzername und Passwort eingeben.' },
         { status: 400 }
       );
     }
 
-    const customer = await findCustomerByEmail(email);
+    const customer = await findCustomerByEmailOrUsername(identifier);
     if (!customer) {
       return NextResponse.json(
-        { success: false, message: 'Kein Konto mit dieser E-Mail-Adresse gefunden.' },
+        { success: false, message: 'Kein Konto mit dieser E-Mail-Adresse oder Benutzername gefunden.' },
         { status: 401 }
       );
     }
