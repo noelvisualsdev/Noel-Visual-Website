@@ -20,17 +20,25 @@ export async function getPartners(): Promise<PartnerDocument[]> {
       const db = client.db('noelvisuals');
       const docs = await db.collection('partners').find({}).sort({ _id: -1 }).toArray();
       if (docs && docs.length > 0) {
-        return docs.map((doc) => ({
-          _id: doc._id.toString(),
-          id: doc._id.toString(),
-          name: String(doc.name || ''),
-          logoUrl: doc.logoUrl ? String(doc.logoUrl) : '',
-          websiteUrl: doc.websiteUrl ? String(doc.websiteUrl) : '',
-          description: doc.description ? String(doc.description) : '',
-          category: doc.category ? String(doc.category) : 'Partner',
-          featured: Boolean(doc.featured),
-          createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
-        }));
+        return docs.map((doc) => {
+          const name = doc.name || doc.title || doc.partnerName || doc.username || 'Partner';
+          const logoUrl = doc.logoUrl || doc.logo || doc.image || doc.avatar || doc.icon || '';
+          const websiteUrl = doc.websiteUrl || doc.website || doc.url || doc.link || '';
+          const description = doc.description || doc.desc || doc.bio || '';
+          const category = doc.category || doc.type || 'Partner';
+
+          return {
+            _id: doc._id.toString(),
+            id: doc._id.toString(),
+            name: String(name),
+            logoUrl: String(logoUrl),
+            websiteUrl: String(websiteUrl),
+            description: String(description),
+            category: String(category),
+            featured: Boolean(doc.featured),
+            createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
+          };
+        });
       }
     } catch (e) {
       console.warn('[MongoDB] Partners query failed:', e);
