@@ -98,7 +98,9 @@ export const WorkSection = ({ previewOnly = false }: WorkSectionProps) => {
                 subtitle: project.type ? `TYPE: ${project.type.toUpperCase()}` : 'WORK',
                 category: (project.type as any) || 'Editing',
                 client: project.clientId ? `Client #${project.clientId.slice(-4)}` : 'Client',
-                image: project.images && project.images.length > 0 ? project.images[0] : '/images/featured_edit_city_nights.jpg',
+                image: project.images && project.images.length > 0
+                  ? project.images[0]
+                  : '/images/featured_edit_city_nights.jpg',
                 videoUrl: project.videoUrl || '',
                 description: project.description,
                 deliverables: ['Graphic Render', 'Source Assets', '4K Master'],

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Project } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { ArrowUpRight, Play, Eye, TrendingUp } from 'lucide-react';
+import { ArrowUpRight, Play, Eye, TrendingUp, Film } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface PortfolioCardProps {
@@ -65,8 +65,17 @@ export const PortfolioCard = ({ project, onOpenModal }: PortfolioCardProps) => {
           )}
         </div>
 
-
-
+        {/* Play Button — only shown when project has a video */}
+        {project.videoUrl && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-full bg-white/90 text-black flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+              <Play className="w-6 h-6 fill-black translate-x-0.5" />
+            </div>
+            <span className="absolute bottom-3 right-3 text-[10px] font-mono text-white/70 bg-black/60 px-2 py-0.5 rounded flex items-center gap-1">
+              <Film className="w-3 h-3" /> VIDEO
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Content */}

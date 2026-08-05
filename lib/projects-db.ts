@@ -39,24 +39,37 @@ export async function getProjects(): Promise<ProjectDocument[]> {
       const db = client.db('noelvisuals');
       const docs = await db.collection('projects').find({}).sort({ _id: -1 }).toArray();
       if (docs && docs.length > 0) {
-        return docs.map((doc) => ({
-          _id: doc._id.toString(),
-          id: doc._id.toString(),
-          type: String(doc.type || 'work'),
-          clientId: doc.clientId ? String(doc.clientId) : '',
-          title: String(doc.title || 'Untitled Project'),
-          description: String(doc.description || ''),
-          images: Array.isArray(doc.images) && doc.images.length > 0
-            ? doc.images
-            : ['/images/featured_edit_city_nights.jpg'],
-          videoUrl: doc.videoUrl ? String(doc.videoUrl) : undefined,
-          channelId: doc.channelId ? String(doc.channelId) : '',
-          createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
-          // Visual computed helpers
-          subtitle: String(doc.type || 'WORK SHOWCASE').toUpperCase(),
-          category: String(doc.type || 'Editing'),
-          client: doc.clientId ? `Client #${String(doc.clientId).slice(-4)}` : 'Verified Client',
-        }));
+        return docs.map((doc) => {
+          const allUrls: string[] = Array.isArray(doc.images) ? doc.images : [];
+
+          // Auto-detect: separate video URLs from image URLs
+          const isVideoUrl = (url: string) =>
+            /\.(mp4|mov|webm|avi|mkv)(\?|$)/i.test(url);
+
+          const imageUrls = allUrls.filter(u => !isVideoUrl(u));
+          const videoUrls = allUrls.filter(u => isVideoUrl(u));
+
+          // Use explicit videoUrl field OR first detected video URL
+          const videoUrl = doc.videoUrl || videoUrls[0] || '';
+          // Thumbnail = explicit image OR first image URL
+          const thumbnail = imageUrls[0] || '/images/featured_edit_city_nights.jpg';
+
+          return {
+            _id: doc._id.toString(),
+            id: doc._id.toString(),
+            type: String(doc.type || 'work'),
+            clientId: doc.clientId ? String(doc.clientId) : '',
+            title: String(doc.title || 'Untitled Project'),
+            description: String(doc.description || ''),
+            images: imageUrls.length > 0 ? imageUrls : ['/images/featured_edit_city_nights.jpg'],
+            videoUrl: videoUrl || undefined,
+            channelId: doc.channelId ? String(doc.channelId) : '',
+            createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
+            subtitle: String(doc.type || 'WORK SHOWCASE').toUpperCase(),
+            category: String(doc.type || 'Editing'),
+            client: doc.clientId ? `Client #${String(doc.clientId).slice(-4)}` : 'Verified Client',
+          };
+        });
       }
     } catch (e) {
       console.warn('[MongoDB] Projects query fallback:', e);

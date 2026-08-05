@@ -129,11 +129,6 @@ export const FeaturedShowreelModal = ({
                     className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-white/90 text-black flex items-center justify-center shadow-2xl hover:scale-110 transition-transform cursor-pointer">
-                      <Play className="w-8 h-8 fill-black translate-x-1" />
-                    </div>
-                  </div>
                 </>
               )}
             </div>
