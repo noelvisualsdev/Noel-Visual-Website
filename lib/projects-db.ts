@@ -39,27 +39,55 @@ export async function getProjects(): Promise<ProjectDocument[]> {
       const db = client.db('noelvisuals');
       const docs = await db.collection('projects').find({}).sort({ _id: -1 }).toArray();
       if (docs && docs.length > 0) {
-        return docs.map((doc) => {
-          let allUrls: string[] = [];
+        const DEFAULT_STUDIO_IMAGES = [
+          '/images/featured_edit_city_nights.jpg',
+          '/images/featured_edit_neon_cyber.jpg',
+          '/images/featured_edit_brand_identity.jpg',
+          '/images/featured_edit_thumbnail_art.jpg',
+          '/images/og-image.png',
+        ];
+
+        return docs.map((doc, idx) => {
+          let rawUrls: string[] = [];
           if (Array.isArray(doc.images)) {
-            allUrls = doc.images;
+            rawUrls = doc.images;
           } else if (typeof doc.images === 'string' && doc.images.trim()) {
-            allUrls = [doc.images.trim()];
+            rawUrls = [doc.images.trim()];
           } else if (typeof doc.image === 'string' && doc.image.trim()) {
-            allUrls = [doc.image.trim()];
+            rawUrls = [doc.image.trim()];
           }
+
+          // Sanitize: Expired Discord CDN attachments (ex=... links) return 403 Forbidden for external visitors.
+          // Replace expired Discord attachment links with permanent studio showcase images.
+          const sanitizeUrl = (url: string, index: number, projType: string) => {
+            if (!url) return '';
+            if (url.includes('cdn.discordapp.com/attachments/') || url.includes('media.discordapp.net/attachments/')) {
+              const lowerType = (projType || '').toLowerCase();
+              if (lowerType.includes('thumb')) return '/images/featured_edit_thumbnail_art.jpg';
+              if (lowerType.includes('brand') || lowerType.includes('design')) return '/images/featured_edit_brand_identity.jpg';
+              if (lowerType.includes('cyber') || lowerType.includes('gaming')) return '/images/featured_edit_neon_cyber.jpg';
+              return DEFAULT_STUDIO_IMAGES[index % DEFAULT_STUDIO_IMAGES.length];
+            }
+            return url;
+          };
+
+          const allUrls = rawUrls.map((u, i) => sanitizeUrl(u, idx + i, String(doc.type || '')));
 
           // Auto-detect: separate video URLs from image URLs
           const isVideoUrl = (url: string) =>
             Boolean(url && /\.(mp4|mov|webm|avi|mkv)(\?|$)/i.test(url.toLowerCase()));
 
-          const imageUrls = allUrls.filter(u => !isVideoUrl(u));
-          const videoUrls = allUrls.filter(u => isVideoUrl(u));
+          const imageUrls = allUrls.filter(u => u && !isVideoUrl(u));
+          const videoUrls = allUrls.filter(u => u && isVideoUrl(u));
 
-          // Use explicit videoUrl field OR first detected video URL
-          const videoUrl = doc.videoUrl || doc.video || videoUrls[0] || undefined;
-          // Thumbnail = explicit image OR first image URL OR fallback
-          const thumbnail = imageUrls[0] || (allUrls.length > 0 ? allUrls[0] : '/images/featured_edit_city_nights.jpg');
+          const rawVideo = doc.videoUrl || doc.video;
+          const sanitizedVideo = rawVideo && !rawVideo.includes('cdn.discordapp.com/attachments/')
+            ? rawVideo
+            : videoUrls[0] || undefined;
+
+          // Thumbnail = first valid image OR studio fallback image
+          const fallbackImg = DEFAULT_STUDIO_IMAGES[idx % DEFAULT_STUDIO_IMAGES.length];
+          const thumbnail = imageUrls[0] || fallbackImg;
 
           return {
             _id: doc._id.toString(),
@@ -70,7 +98,7 @@ export async function getProjects(): Promise<ProjectDocument[]> {
             description: String(doc.description || ''),
             image: thumbnail,
             images: imageUrls.length > 0 ? imageUrls : [thumbnail],
-            videoUrl: videoUrl,
+            videoUrl: sanitizedVideo,
             channelId: doc.channelId ? String(doc.channelId) : '',
             createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
             subtitle: String(doc.type || 'WORK SHOWCASE').toUpperCase(),
