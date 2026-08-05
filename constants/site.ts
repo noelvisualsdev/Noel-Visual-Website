@@ -9,6 +9,7 @@ export const SITE_CONFIG = {
   navLinks: [
     { label: 'WORK', href: '/work' },
     { label: 'SERVICES', href: '/services' },
+    { label: 'PREISE', href: '/preise' },
     { label: 'ABOUT', href: '/about' },
     { label: 'PROCESS', href: '/process' },
     { label: 'REVIEWS', href: '/reviews' },
