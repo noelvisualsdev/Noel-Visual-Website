@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { SITE_CONFIG } from '@/constants/site';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
-import { ArrowRight, Menu, X, LogIn, ShieldAlert, LogOut, LayoutDashboard, ShieldCheck, UserPlus, User } from 'lucide-react';
+import { ArrowRight, Menu, X, LogIn, ShieldAlert, LogOut, LayoutDashboard, ShieldCheck, UserPlus, User, Settings } from 'lucide-react';
 import { MobileMenu } from './MobileMenu';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/components/providers/AuthProvider';
@@ -160,6 +160,15 @@ export const Navbar = () => {
                           <span>OPEN ADMIN DASHBOARD</span>
                         </Link>
                       )}
+
+                      <Link
+                        href="/settings"
+                        onClick={() => setAuthDropdownOpen(false)}
+                        className="flex items-center gap-2 p-2 rounded-lg text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <Settings className="w-4 h-4" />
+                        <span>Settings</span>
+                      </Link>
 
                       <button
                         onClick={() => {
