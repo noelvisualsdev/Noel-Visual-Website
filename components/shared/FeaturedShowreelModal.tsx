@@ -19,6 +19,7 @@ export const FeaturedShowreelModal = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(0.5); // Start at 50% volume
 
   if (!project) return null;
 
@@ -41,8 +42,25 @@ export const FeaturedShowreelModal = ({
 
   const toggleMute = () => {
     if (!videoRef.current) return;
-    videoRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
+    const newMuted = !isMuted;
+    videoRef.current.muted = newMuted;
+    setIsMuted(newMuted);
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!videoRef.current) return;
+    const val = parseFloat(e.target.value);
+    videoRef.current.volume = val;
+    videoRef.current.muted = val === 0;
+    setVolume(val);
+    setIsMuted(val === 0);
+  };
+
+  const handleVideoLoad = () => {
+    // Set initial volume when video loads
+    if (videoRef.current) {
+      videoRef.current.volume = volume;
+    }
   };
 
   return (
@@ -82,28 +100,52 @@ export const FeaturedShowreelModal = ({
                     className="w-full h-full object-cover"
                     playsInline
                     onEnded={() => setIsPlaying(false)}
+                    onLoadedMetadata={handleVideoLoad}
                     poster={projectImage}
                   />
                   {/* Video Controls Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
                     <div className="flex items-center gap-3">
+                      {/* Play/Pause */}
                       <button
                         onClick={togglePlay}
-                        className="w-10 h-10 rounded-full bg-white/90 text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+                        className="w-10 h-10 rounded-full bg-white/90 text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg shrink-0"
                       >
                         {isPlaying
                           ? <Pause className="w-4 h-4 fill-black" />
                           : <Play className="w-4 h-4 fill-black translate-x-0.5" />
                         }
                       </button>
+
+                      {/* Mute toggle */}
                       <button
                         onClick={toggleMute}
-                        className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-white/40 transition-colors"
+                        className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-white/40 transition-colors shrink-0"
                       >
-                        {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                        {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                       </button>
-                      <span className="text-xs font-mono text-white/70 ml-auto flex items-center gap-1.5">
-                        <Film className="w-3.5 h-3.5" /> DIRECT VIDEO
+
+                      {/* Volume Slider */}
+                      <div className="flex items-center gap-2 flex-1 max-w-[140px]">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={isMuted ? 0 : volume}
+                          onChange={handleVolumeChange}
+                          className="w-full h-1 rounded-full accent-white cursor-pointer"
+                          style={{
+                            background: `linear-gradient(to right, white ${(isMuted ? 0 : volume) * 100}%, rgba(255,255,255,0.2) ${(isMuted ? 0 : volume) * 100}%)`
+                          }}
+                        />
+                        <span className="text-[10px] font-mono text-white/60 w-6 text-right shrink-0">
+                          {Math.round((isMuted ? 0 : volume) * 100)}
+                        </span>
+                      </div>
+
+                      <span className="text-[10px] font-mono text-white/50 ml-auto flex items-center gap-1 shrink-0">
+                        <Film className="w-3 h-3" /> VIDEO
                       </span>
                     </div>
                   </div>
