@@ -94,7 +94,7 @@ export const Hero = () => {
 
             {/* Giant Title */}
             <div className="space-y-1">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-wider text-white leading-[1.1] font-neuropol drop-shadow-2xl">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-wider text-white leading-[1.1] font-orbitron drop-shadow-2xl">
                 {t.hero.title1}
                 <br />
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-neutral-200 to-amber-300">
