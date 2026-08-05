@@ -2,6 +2,7 @@ import clientPromise from './mongodb';
 import { ObjectId } from 'mongodb';
 import fs from 'fs';
 import path from 'path';
+import { saveExternalMediaLocally } from './upload-helper';
 
 export interface ProjectDocument {
   _id?: string;
@@ -125,13 +126,18 @@ export async function getProjects(): Promise<ProjectDocument[]> {
 export async function addProject(
   data: Omit<ProjectDocument, '_id' | 'id'>
 ): Promise<ProjectDocument> {
+  // Automatically download temporary Discord/external media and save permanently on server
+  const rawImages = data.images && data.images.length > 0 ? data.images : ['/images/featured_edit_city_nights.jpg'];
+  const savedImages = await Promise.all(rawImages.map((img) => saveExternalMediaLocally(img)));
+  const savedVideoUrl = data.videoUrl ? await saveExternalMediaLocally(data.videoUrl) : '';
+
   const newProject: Omit<ProjectDocument, '_id' | 'id'> = {
     type: data.type || 'work',
     clientId: data.clientId || '',
     title: data.title,
     description: data.description,
-    images: data.images && data.images.length > 0 ? data.images : ['/images/featured_edit_city_nights.jpg'],
-    videoUrl: data.videoUrl || '',
+    images: savedImages,
+    videoUrl: savedVideoUrl,
     channelId: data.channelId || '',
     createdAt: new Date().toISOString(),
   };
