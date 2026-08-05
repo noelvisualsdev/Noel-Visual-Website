@@ -64,9 +64,26 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
     setIsSubmitting(true);
 
     try {
-      window.location.reload();
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        if (data.requiresVerification) {
+          setMode('verify');
+        }
+        setErrorMsg(data.message);
+      } else {
+        if (data.user) {
+          localStorage.setItem('noel_discord_session', JSON.stringify(data.user));
+        }
+        window.location.reload();
+      }
     } catch (err) {
-      setErrorMsg('Invalid email or password.');
+      setErrorMsg('Anmeldung fehlgeschlagen. Bitte versuche es erneut.');
     } finally {
       setIsSubmitting(false);
     }
