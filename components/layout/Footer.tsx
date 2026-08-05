@@ -74,7 +74,11 @@ export const Footer = () => {
                 <ArrowUpRight className="w-4 h-4" />
               </a>
             </div>
-            <div className="pt-4 flex items-center gap-4 text-xs">
+            <div className="pt-4 flex flex-wrap items-center gap-4 text-xs">
+              <Link href="/impressum" className="hover:text-white underline">
+                Impressum
+              </Link>
+              <span>•</span>
               <Link href="/privacy" className="hover:text-white underline">
                 Privacy Policy
               </Link>
