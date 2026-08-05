@@ -30,7 +30,7 @@ export const AboutSection = () => {
             <div className="grid grid-cols-2 gap-4 pt-4">
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1">
                 <div className="text-2xl font-black font-mono text-white">
-                  150 Mio.+
+                  350+
                 </div>
 
                 <div className="text-xs text-neutral-400 font-mono">
@@ -40,7 +40,7 @@ export const AboutSection = () => {
 
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1">
                 <div className="text-2xl font-black font-mono text-white">
-                  20+
+                  15+
                 </div>
 
                 <div className="text-xs text-neutral-400 font-mono">

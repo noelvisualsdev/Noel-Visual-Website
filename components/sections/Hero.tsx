@@ -50,16 +50,27 @@ export const Hero = () => {
       .catch((err) => console.warn('Using default hero project:', err));
   }, []);
 
+  const [heroImgError, setHeroImgError] = useState(false);
+
   const activeProject = projects[currentIndex] || projects[0];
-  const projectImage = activeProject.images && activeProject.images.length > 0
-    ? activeProject.images[0]
-    : '/images/featured_edit_city_nights.jpg';
+  const allUrls = activeProject.images || [];
+  const rawImage = allUrls[0] || '';
+
+  const isVideo = (url: string) =>
+    Boolean(url && /\.(mp4|mov|webm|avi|mkv)(\?|$)/i.test(url.toLowerCase()));
+
+  const showVideo = isVideo(rawImage) || isVideo(activeProject.videoUrl || '');
+  const videoSrc = isVideo(rawImage) ? rawImage : (activeProject.videoUrl || '');
+  const fallbackImage = '/images/featured_edit_city_nights.jpg';
+  const displayImage = heroImgError ? fallbackImage : (rawImage || fallbackImage);
 
   const handleNext = () => {
+    setHeroImgError(false);
     setCurrentIndex((prev) => (prev + 1) % projects.length);
   };
 
   const handlePrev = () => {
+    setHeroImgError(false);
     setCurrentIndex((prev) => (prev - 1 + projects.length) % projects.length);
   };
 
@@ -156,15 +167,27 @@ export const Hero = () => {
                     transition={{ duration: 0.4 }}
                     className="relative aspect-[16/10] sm:aspect-[16/9] w-full rounded-xl overflow-hidden bg-black"
                   >
-                    {/* Background Artwork */}
-                    <Image
-                      src={projectImage}
-                      alt={activeProject.title}
-                      fill
-                      priority
-                      unoptimized={projectImage?.startsWith('http')}
-                      className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                    />
+                    {/* Background Artwork or Video */}
+                    {showVideo ? (
+                      <video
+                        src={videoSrc}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                      />
+                    ) : (
+                      <Image
+                        src={displayImage}
+                        alt={activeProject.title || 'Project'}
+                        fill
+                        priority
+                        unoptimized={displayImage.startsWith('http')}
+                        onError={() => setHeroImgError(true)}
+                        className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                      />
+                    )}
 
                     {/* Dark Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
