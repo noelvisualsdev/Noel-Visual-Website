@@ -49,6 +49,33 @@ export async function getProjects(): Promise<ProjectDocument[]> {
           '/images/og-image.png',
         ];
 
+        // Background Auto-Persister: Save any fresh Discord attachments to server disk & update MongoDB Atlas
+        docs.forEach((doc) => {
+          if (doc._id && Array.isArray(doc.images)) {
+            const hasDiscordUrl = doc.images.some(u => typeof u === 'string' && u.includes('cdn.discordapp.com/attachments/'));
+            if (hasDiscordUrl) {
+              Promise.all(doc.images.map(u => saveExternalMediaLocally(u))).then(async (savedImgs) => {
+                const isChanged = savedImgs.some((s, i) => s !== doc.images[i]);
+                if (isChanged) {
+                  try {
+                    const client = await clientPromise;
+                    if (client) {
+                      const db = client.db('noelvisuals');
+                      await db.collection('projects').updateOne(
+                        { _id: doc._id },
+                        { $set: { images: savedImgs, image: savedImgs[0], updatedAt: new Date() } }
+                      );
+                      console.log(`[AutoMediaSaver] Updated project "${doc.title}" in MongoDB with permanent local paths.`);
+                    }
+                  } catch (err) {
+                    console.warn('[AutoMediaSaver] MongoDB update error:', err);
+                  }
+                }
+              }).catch(() => {});
+            }
+          }
+        });
+
         return docs.map((doc, idx) => {
           let rawUrls: string[] = [];
           if (Array.isArray(doc.images)) {
