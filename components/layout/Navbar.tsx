@@ -58,7 +58,7 @@ export const Navbar = () => {
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-4 xl:gap-7 text-[11px] xl:text-xs font-semibold tracking-wider uppercase font-orbitron">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-7 text-xs sm:text-sm font-sans font-medium tracking-normal">
             {SITE_CONFIG.navLinks.map((link) => {
               const isActive =
                 pathname === link.href ||
@@ -69,15 +69,15 @@ export const Navbar = () => {
                   key={link.label}
                   href={link.href}
                   className={cn(
-                    'relative py-1 transition-colors whitespace-nowrap hover:text-white',
-                    isActive ? 'text-white' : 'text-neutral-300'
+                    'relative px-2.5 py-1.5 rounded-lg transition-colors whitespace-nowrap',
+                    isActive ? 'text-white font-semibold bg-white/10' : 'text-neutral-300 hover:text-white hover:bg-white/5'
                   )}
                 >
                   {link.label}
                   {isActive && (
                     <motion.div
                       layoutId="activeNavUnderline"
-                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-white rounded-full"
+                      className="absolute bottom-0 left-2 right-2 h-[2px] bg-white rounded-full"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -89,11 +89,11 @@ export const Navbar = () => {
             {user?.isAdmin && (
               <Link
                 href="/admin"
-                className="text-amber-400 font-bold hover:text-amber-300 flex items-center gap-1.5 bg-amber-400/10 px-2.5 py-1 rounded-full border border-amber-400/30 text-[11px] font-mono shrink-0 transition-colors"
+                className="text-amber-300 font-bold hover:text-amber-200 flex items-center gap-1.5 bg-amber-500/20 px-3 py-1.5 rounded-lg border border-amber-400/40 text-xs font-mono shrink-0 transition-colors"
                 title="Admin Dashboard"
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                <span>ADMIN</span>
+                <ShieldCheck className="w-4 h-4 text-amber-400" />
+                <span>Admin Dashboard</span>
               </Link>
             )}
           </nav>
