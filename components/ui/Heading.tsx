@@ -23,7 +23,7 @@ export const Heading = ({
 
   return (
     <Component
-      className={cn('text-white font-sans', sizes[size], className)}
+      className={cn('text-white font-orbitron', sizes[size], className)}
       {...props}
     >
       {children}
