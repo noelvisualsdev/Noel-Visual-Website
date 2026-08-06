@@ -42,9 +42,9 @@ export const Navbar = () => {
           scrolled ? 'glass-nav py-3 md:py-4 shadow-2xl' : 'bg-transparent'
         )}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group focus:outline-none">
+          <Link href="/" className="flex items-center gap-2.5 group focus:outline-none shrink-0">
             <div className="relative w-9 h-9 rounded-lg overflow-hidden border border-white/20 shadow-md group-hover:scale-105 transition-transform bg-black">
               <img
                 src="/images/logo.png"
@@ -52,13 +52,13 @@ export const Navbar = () => {
                 className="w-full h-full object-contain p-0.5"
               />
             </div>
-            <span className="font-extrabold tracking-widest text-sm md:text-base text-white uppercase font-sans">
+            <span className="font-extrabold tracking-wider text-sm md:text-base text-white uppercase font-orbitron whitespace-nowrap">
               NOEL VISUALS
             </span>
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-8 text-xs font-semibold tracking-widest uppercase">
+          <nav className="hidden lg:flex items-center gap-4 xl:gap-7 text-[11px] xl:text-xs font-semibold tracking-wider uppercase font-orbitron">
             {SITE_CONFIG.navLinks.map((link) => {
               const isActive =
                 pathname === link.href ||
@@ -69,8 +69,8 @@ export const Navbar = () => {
                   key={link.label}
                   href={link.href}
                   className={cn(
-                    'relative py-1 transition-colors hover:text-white',
-                    isActive ? 'text-white' : 'text-neutral-400'
+                    'relative py-1 transition-colors whitespace-nowrap hover:text-white',
+                    isActive ? 'text-white' : 'text-neutral-300'
                   )}
                 >
                   {link.label}
@@ -89,16 +89,17 @@ export const Navbar = () => {
             {user?.isAdmin && (
               <Link
                 href="/admin"
-                className="text-amber-400 font-bold hover:text-amber-300 flex items-center gap-1.5 bg-amber-400/10 px-2.5 py-1 rounded-md border border-amber-400/30"
+                className="text-amber-400 font-bold hover:text-amber-300 flex items-center gap-1.5 bg-amber-400/10 px-2.5 py-1 rounded-full border border-amber-400/30 text-[11px] font-mono shrink-0 transition-colors"
+                title="Admin Dashboard"
               >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                ADMIN DASHBOARD
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                <span>ADMIN</span>
               </Link>
             )}
           </nav>
 
           {/* Action Buttons & Auth */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3">
             {/* Language Switcher Toggle */}
             <button
               onClick={() => setLanguage(language === 'en' ? 'de' : 'en')}
@@ -114,7 +115,7 @@ export const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={() => setAuthDropdownOpen(!authDropdownOpen)}
-                  className="flex items-center gap-2.5 p-1.5 pr-3 rounded-full bg-white/10 border border-white/20 hover:border-white/40 transition-all text-xs font-mono"
+                  className="flex items-center gap-2.5 p-1.5 pr-3 rounded-full bg-white/10 border border-white/20 hover:border-white/40 transition-all text-xs font-mono cursor-pointer"
                 >
                   <img
                     src={user.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}
@@ -138,28 +139,13 @@ export const Navbar = () => {
                       <div className="p-2.5 rounded-lg bg-white/5 space-y-1">
                         <div className="font-bold text-white flex items-center justify-between">
                           <span>@{user.username || 'User'}</span>
-                          <span className="text-[10px] font-mono text-emerald-400">Verifiziert ✓</span>
-                        </div>
-                        {user.email && (
-                          <p className="text-[10px] font-mono text-neutral-400 truncate">
-                            {user.email}
-                          </p>
-                        )}
-
-                        {/* Role status */}
-                        <div className="pt-2 flex items-center gap-1.5 text-[10px] font-mono">
-                          {user.isAdmin ? (
-                            <span className="text-amber-400 flex items-center gap-1 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                              <ShieldCheck className="w-3 h-3 text-amber-400" />
-                              Staff / Admin Status Verifiziert
-                            </span>
-                          ) : (
-                            <span className="text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                              <User className="w-3 h-3 text-emerald-400" />
-                              Kunden-Account Verifiziert
+                          {user.isAdmin && (
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 font-bold border border-amber-400/30">
+                              ADMIN
                             </span>
                           )}
                         </div>
+                        <p className="text-[10px] text-neutral-400 truncate">{user.id}</p>
                       </div>
 
                       {user.isAdmin && (
@@ -216,7 +202,7 @@ export const Navbar = () => {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-neutral-300 hover:text-white focus:outline-none rounded-lg bg-white/5 border border-white/10"
+            className="lg:hidden p-2 text-neutral-300 hover:text-white focus:outline-none rounded-lg bg-white/5 border border-white/10"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
