@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
-import { Plus, CheckCircle2, Trash2, Edit, X, Image as ImageIcon, Film, Upload, Paperclip, Loader2, Sparkles } from 'lucide-react';
+import { Plus, CheckCircle2, Trash2, Edit, X, Image as ImageIcon, Film, Upload, Paperclip, Loader2, Sparkles, AlertCircle } from 'lucide-react';
 import { ProjectDocument } from '@/lib/projects-db';
 
 const STUDIO_PRESET_IMAGES = [
@@ -18,7 +18,7 @@ const fallbackImage = '/images/featured_edit_city_nights.jpg';
 const normalizeUrl = (url?: string) => {
   if (!url) return fallbackImage;
   let u = url.trim();
-  if (u.startsWith('data:')) return u;
+  if (u.startsWith('data:') || u.startsWith('blob:')) return u;
   if (u.includes('cdn.discordapp.com/attachments/') || u.includes('media.discordapp.net/attachments/')) {
     return fallbackImage;
   }
@@ -32,6 +32,7 @@ export default function AdminProjectsPage() {
   const [projects, setProjects] = useState<ProjectDocument[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // NEW PROJECT MODAL STATE
@@ -68,16 +69,18 @@ export default function AdminProjectsPage() {
     fetchProjects();
   }, []);
 
-  // Multi-file upload for New Project / Edit Project (Instant Base64 preview + Server Upload)
+  // Fast Binary FormData File Upload Handler (No giant Base64 strings!)
   const handleMultiFileUpload = async (files: FileList, targetSetter: React.Dispatch<React.SetStateAction<string[]>>) => {
     setIsUploadingMultiple(true);
-    const newMediaItems: string[] = [];
+    setErrorMsg('');
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
 
-      // 1. Try uploading to server API
-      let serverUrl = '';
+      // Instant client-side preview URL using URL.createObjectURL
+      const localPreviewUrl = URL.createObjectURL(file);
+      targetSetter((prev) => [...prev, localPreviewUrl]);
+
       try {
         const formData = new FormData();
         formData.append('file', file);
@@ -89,63 +92,22 @@ export default function AdminProjectsPage() {
 
         const data = await res.json();
         if (data.success && data.url) {
-          serverUrl = normalizeUrl(data.url);
+          const finalUrl = normalizeUrl(data.url);
+          // Replace local preview URL with permanent server path
+          targetSetter((prev) => prev.map((item) => (item === localPreviewUrl ? finalUrl : item)));
+        } else {
+          console.warn('[Upload Error]:', data.message);
         }
-      } catch (err) {
-        console.warn('[Upload] API upload warning, using Base64 fallback:', err);
-      }
-
-      if (serverUrl) {
-        newMediaItems.push(serverUrl);
-      } else {
-        // 2. Read as Base64 for 100% guaranteed instant preview
-        try {
-          const base64 = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          });
-          if (base64) {
-            newMediaItems.push(base64);
-          }
-        } catch (e) {
-          console.error('[Upload] Base64 reader error:', e);
-        }
+      } catch (err: any) {
+        console.error('[Upload Fetch Error]:', err);
       }
     }
 
-    targetSetter((prev) => [...prev, ...newMediaItems]);
     setIsUploadingMultiple(false);
   };
 
   const removeAttachedItem = (index: number, targetSetter: React.Dispatch<React.SetStateAction<string[]>>) => {
     targetSetter((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  // Helper to ensure any Base64 preview strings are converted to short server URLs before submitting form
-  const ensureUploadedUrls = async (urls: string[]): Promise<string[]> => {
-    const processed: string[] = [];
-    for (const url of urls) {
-      if (url && url.startsWith('data:')) {
-        try {
-          const res = await fetch('/api/admin/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ base64: url }),
-          });
-          const data = await res.json();
-          if (data.success && data.url) {
-            processed.push(normalizeUrl(data.url));
-            continue;
-          }
-        } catch (err) {
-          console.error('Base64 pre-upload error:', err);
-        }
-      }
-      processed.push(normalizeUrl(url));
-    }
-    return processed;
   };
 
   // Submit New Project Form
@@ -155,17 +117,16 @@ export default function AdminProjectsPage() {
 
     setIsSubmitting(true);
     setSuccessMsg('');
+    setErrorMsg('');
 
     let fullDescription = newDescDe.trim();
     if (newDescEn.trim()) {
       fullDescription = `${newDescDe.trim()}\n\n[EN]: ${newDescEn.trim()}`;
     }
 
-    try {
-      const rawImages = attachedMedia.length > 0 ? attachedMedia : [fallbackImage];
-      const finalImages = await ensureUploadedUrls(rawImages);
-      const finalVideoUrl = newVideoUrl.trim() ? (await ensureUploadedUrls([newVideoUrl.trim()]))[0] : '';
+    const finalImages = attachedMedia.length > 0 ? attachedMedia.map(normalizeUrl) : [fallbackImage];
 
+    try {
       const res = await fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -174,14 +135,14 @@ export default function AdminProjectsPage() {
           type: newType,
           description: fullDescription,
           images: finalImages,
-          videoUrl: finalVideoUrl,
+          videoUrl: newVideoUrl.trim() ? normalizeUrl(newVideoUrl.trim()) : '',
           clientId: '865289707328110662',
         }),
       });
 
       const data = await res.json();
       if (data.success) {
-        setSuccessMsg(`Neues Projekt "${newTitle}" mit ${finalImages.length} Medien auf dem Server veröffentlicht!`);
+        setSuccessMsg(`Neues Projekt "${newTitle}" mit ${finalImages.length} Medien veröffentlicht!`);
         setIsNewModalOpen(false);
         setNewTitle('');
         setNewDescDe('');
@@ -189,9 +150,12 @@ export default function AdminProjectsPage() {
         setAttachedMedia([]);
         setNewVideoUrl('');
         fetchProjects();
+      } else {
+        setErrorMsg(data.message || 'Fehler beim Erstellen des Projekts.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setErrorMsg('Netzwerk-Fehler beim Speichern. Bitte versuche es erneut.');
     } finally {
       setIsSubmitting(false);
     }
@@ -205,17 +169,18 @@ export default function AdminProjectsPage() {
     setEditDescription(proj.description || '');
     setEditImages(proj.images && proj.images.length > 0 ? proj.images.map(normalizeUrl) : [normalizeUrl(proj.image)]);
     setEditVideoUrl(proj.videoUrl ? normalizeUrl(proj.videoUrl) : '');
+    setErrorMsg('');
   };
 
   const handleUpdateProject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingProject) return;
     setIsUpdating(true);
+    setErrorMsg('');
 
     try {
-      const rawImages = editImages.length > 0 ? editImages : [fallbackImage];
-      const finalImages = await ensureUploadedUrls(rawImages);
-      const finalVideoUrl = editVideoUrl ? (await ensureUploadedUrls([editVideoUrl]))[0] : '';
+      const finalImages = editImages.length > 0 ? editImages.map(normalizeUrl) : [fallbackImage];
+      const finalVideoUrl = editVideoUrl ? normalizeUrl(editVideoUrl) : '';
 
       const res = await fetch('/api/projects', {
         method: 'PUT',
@@ -232,12 +197,15 @@ export default function AdminProjectsPage() {
 
       const data = await res.json();
       if (data.success) {
-        setSuccessMsg(`Projekt "${editTitle}" erfolgreich aktualisiert!`);
+        setSuccessMsg(`Projekt "${editTitle}" erfolgreich gespeichert!`);
         setEditingProject(null);
         fetchProjects();
+      } else {
+        setErrorMsg(data.message || 'Fehler beim Speichern des Projekts.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setErrorMsg('Netzwerk-Fehler beim Speichern. Bitte erneut versuchen.');
     } finally {
       setIsUpdating(false);
     }
@@ -274,7 +242,10 @@ export default function AdminProjectsPage() {
         </div>
 
         <button
-          onClick={() => setIsNewModalOpen(true)}
+          onClick={() => {
+            setIsNewModalOpen(true);
+            setErrorMsg('');
+          }}
           className="px-6 py-3.5 rounded-xl bg-[#5865f2] hover:bg-[#4752c4] text-white font-extrabold text-xs uppercase tracking-wider font-orbitron shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
@@ -287,6 +258,14 @@ export default function AdminProjectsPage() {
         <div className="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-bold flex items-center gap-2 animate-fade-in">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{successMsg}</span>
+        </div>
+      )}
+
+      {/* Error Notification */}
+      {errorMsg && (
+        <div className="p-4 rounded-xl bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-mono font-bold flex items-center gap-2 animate-fade-in">
+          <AlertCircle className="w-4 h-4 text-red-400" />
+          <span>{errorMsg}</span>
         </div>
       )}
 
@@ -505,7 +484,7 @@ export default function AdminProjectsPage() {
                     ) : (
                       <Upload className="w-4 h-4 text-black" />
                     )}
-                    <span>{isUploadingMultiple ? 'MEDIEN WERDEN HOCHGELADEN...' : '📁 BILDER / VIDEOS VOM PC HOCHLADEN'}</span>
+                    <span>{isUploadingMultiple ? 'HOCHLADEN...' : '📁 BILDER / VIDEOS VOM PC HOCHLADEN'}</span>
                     <input
                       type="file"
                       multiple
@@ -514,6 +493,7 @@ export default function AdminProjectsPage() {
                       onChange={(e) => {
                         if (e.target.files && e.target.files.length > 0) {
                           handleMultiFileUpload(e.target.files, setAttachedMedia);
+                          e.target.value = '';
                         }
                       }}
                     />
@@ -575,11 +555,11 @@ export default function AdminProjectsPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting || !newTitle.trim() || !newDescDe.trim()}
+                  disabled={isSubmitting || isUploadingMultiple || !newTitle.trim() || !newDescDe.trim()}
                   className="w-full sm:w-auto px-8 py-3 rounded-xl bg-white hover:bg-neutral-200 text-black font-extrabold text-xs uppercase tracking-wider font-orbitron transition-all shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                 >
                   {isSubmitting && <Loader2 className="w-4 h-4 animate-spin text-black" />}
-                  <span>{isSubmitting ? 'VERÖFFENTLICHEN...' : 'PROJEKT POSTEN'}</span>
+                  <span>{isSubmitting ? 'POSTEN...' : 'PROJEKT POSTEN'}</span>
                 </button>
               </div>
             </form>
@@ -653,7 +633,7 @@ export default function AdminProjectsPage() {
                 {/* PC Upload Button */}
                 <label className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-black hover:bg-neutral-200 text-xs font-bold font-mono cursor-pointer transition-all hover:scale-105 active:scale-95 shadow-xl">
                   {isUploadingMultiple ? <Loader2 className="w-4 h-4 animate-spin text-black" /> : <Upload className="w-4 h-4 text-black" />}
-                  <span>📁 WEITERE BILDER VOM PC HOCHLADEN</span>
+                  <span>{isUploadingMultiple ? 'HOCHLADEN...' : '📁 WEITERE BILDER VOM PC HOCHLADEN'}</span>
                   <input
                     type="file"
                     multiple
@@ -662,6 +642,7 @@ export default function AdminProjectsPage() {
                     onChange={(e) => {
                       if (e.target.files && e.target.files.length > 0) {
                         handleMultiFileUpload(e.target.files, setEditImages);
+                        e.target.value = '';
                       }
                     }}
                   />
@@ -700,10 +681,11 @@ export default function AdminProjectsPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isUpdating}
-                  className="px-8 py-3 rounded-xl bg-white hover:bg-neutral-200 text-black font-extrabold text-xs uppercase tracking-wider font-orbitron transition-all shadow-xl cursor-pointer"
+                  disabled={isUpdating || isUploadingMultiple}
+                  className="px-8 py-3 rounded-xl bg-white hover:bg-neutral-200 text-black font-extrabold text-xs uppercase tracking-wider font-orbitron transition-all shadow-xl cursor-pointer disabled:opacity-50 flex items-center gap-2"
                 >
-                  {isUpdating ? 'SPEICHERN...' : 'ÄNDERUNGEN SPEICHERN'}
+                  {isUpdating && <Loader2 className="w-4 h-4 animate-spin text-black" />}
+                  <span>{isUpdating ? 'SPEICHERN...' : 'ÄNDERUNGEN SPEICHERN'}</span>
                 </button>
               </div>
             </form>
