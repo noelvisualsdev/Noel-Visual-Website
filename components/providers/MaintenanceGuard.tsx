@@ -36,25 +36,33 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  // If user is Staff and forcePreview is false, allow bypass
+  // If user is Staff and forcePreview is false, allow bypass with a clean floating bottom-right indicator
   if (!forcePreview && isAuthenticated && user?.isAdmin) {
     return (
       <>
-        {/* Top Staff Bypass Indicator Banner */}
-        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-black text-[11px] font-mono font-bold py-1.5 px-4 text-center flex items-center justify-between shadow-xl border-b border-amber-600">
-          <div className="flex items-center gap-2 mx-auto">
+        {children}
+
+        {/* Floating Bottom-Right Staff Bypass Indicator Pill (No Navbar Collision) */}
+        <div className="fixed bottom-6 right-6 z-50 bg-[#0d0e15]/95 backdrop-blur-xl border border-amber-500/40 text-amber-300 text-xs font-mono font-bold p-3 px-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-fade-in max-w-md">
+          <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
             <ShieldCheck className="w-4 h-4" />
-            <span>MAINTENANCE MODE AKTIV — Du hast als Discord Staff (@{user.username}) Zugriff freigeschaltet</span>
+          </div>
+          <div className="space-y-0.5 truncate">
+            <span className="text-white font-bold block text-[11px] uppercase tracking-wider font-orbitron">
+              Wartungsmodus Aktiv
+            </span>
+            <span className="text-[10px] text-neutral-300 block truncate">
+              Staff Access (@{user.username})
+            </span>
           </div>
           <button
             onClick={() => setForcePreview(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-black text-amber-300 hover:text-white font-bold border border-black/30 transition-colors text-[10px] uppercase cursor-pointer"
+            className="px-3 py-1.5 rounded-xl bg-amber-400 text-black hover:bg-amber-300 font-bold border border-amber-300 transition-all text-[10px] uppercase cursor-pointer shrink-0 ml-auto shadow-md"
+            title="Wartungs-Screen als Vorschau anzeigen"
           >
-            <Eye className="w-3.5 h-3.5" />
-            <span>Vorschau-Screen Testen</span>
+            Vorschau
           </button>
         </div>
-        <div className="pt-8">{children}</div>
       </>
     );
   }
@@ -78,7 +86,7 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
       {forcePreview && (
         <button
           onClick={() => setForcePreview(false)}
-          className="fixed top-4 right-4 z-50 px-4 py-2 rounded-xl bg-amber-500 text-black font-extrabold text-xs font-mono border border-amber-400 shadow-2xl flex items-center gap-2 cursor-pointer"
+          className="fixed top-6 right-6 z-50 px-4 py-2.5 rounded-2xl bg-amber-400 text-black font-extrabold text-xs font-orbitron border border-amber-300 shadow-2xl flex items-center gap-2 cursor-pointer hover:scale-105 transition-all"
         >
           <Eye className="w-4 h-4" />
           <span>VORSCHAU BEENDEN (ZURÜCK ZUR WEBSITE)</span>
