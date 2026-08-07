@@ -123,7 +123,13 @@ export const ReviewsSection = () => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] bg-white/[0.02] blur-[150px] rounded-full pointer-events-none" />
 
       <Container size="lg" className="space-y-12 relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 35 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6"
+        >
           <SectionHeader
             badge="DISCORD CLIENT FEEDBACK"
             title="LIVE REVIEWS FROM OUR DISCORD COMMUNITY"
@@ -141,11 +147,11 @@ export const ReviewsSection = () => {
               }
             }}
             leftIcon={<Plus className="w-4 h-4" />}
-            className="bg-white text-black font-bold shrink-0"
+            className="bg-white text-black font-bold shrink-0 shadow-xl hover:scale-105 transition-all"
           >
             WRITE A DISCORD REVIEW
           </Button>
-        </div>
+        </motion.div>
 
         {/* Empty State if zero reviews exist in MongoDB */}
         {reviews.length === 0 && !isLoading && (
@@ -183,7 +189,13 @@ export const ReviewsSection = () => {
         {/* Real MongoDB Review Spotlight Showcase */}
         {reviews.length > 0 && (
           <>
-            <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 45, scale: 0.97 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
+              className="max-w-4xl mx-auto"
+            >
               <div className="glass-card rounded-2xl p-8 md:p-12 relative border border-white/20 shadow-2xl overflow-hidden group">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -268,7 +280,7 @@ export const ReviewsSection = () => {
                   </motion.div>
                 </AnimatePresence>
               </div>
-            </div>
+            </motion.div>
 
             {/* Infinite Marquee Ticker */}
             <div className="space-y-6 pt-8">

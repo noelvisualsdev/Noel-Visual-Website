@@ -25,10 +25,4 @@ export const FAQ_ITEMS: FAQItem[] = [
     answer:
       'We include 2 rounds of free revisions per project. We communicate directly via Frame.io, Discord, or Slack for fast timestamped notes.',
   },
-  {
-    category: 'Rights & Files',
-    question: 'Do I own the full rights and source files?',
-    answer:
-      'Yes! Upon final project payment, you receive 100% full commercial rights to all deliverables and optional access to raw PSD and project project files.',
-  },
 ];

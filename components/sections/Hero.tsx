@@ -292,63 +292,38 @@ export const Hero = () => {
           </div>
         </div>
 
-        {/* Bottom Feature Bar (4 columns) */}
+        {/* Bottom Feature Bar (4 columns) with scroll build-up animations */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-12 border-t border-white/10">
-          <div className="glass-card p-6 rounded-xl flex items-start gap-4 hover:border-white/30 transition-all backdrop-blur-md bg-black/40">
-            <div className="p-3 rounded-lg bg-white/10 border border-white/10 text-white shrink-0">
-              <Clapperboard className="w-5 h-5" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                VIDEO EDITING
-              </h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">
-                Cinematic edits that tell your story with impact.
-              </p>
-            </div>
-          </div>
-
-          <div className="glass-card p-6 rounded-xl flex items-start gap-4 hover:border-white/30 transition-all backdrop-blur-md bg-black/40">
-            <div className="p-3 rounded-lg bg-white/10 border border-white/10 text-white shrink-0">
-              <ImageIcon className="w-5 h-5" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                THUMBNAIL DESIGN
-              </h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">
-                High CTR thumbnails that get more clicks.
-              </p>
-            </div>
-          </div>
-
-          <div className="glass-card p-6 rounded-xl flex items-start gap-4 hover:border-white/30 transition-all backdrop-blur-md bg-black/40">
-            <div className="p-3 rounded-lg bg-white/10 border border-white/10 text-white shrink-0">
-              <PencilRuler className="w-5 h-5" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                GRAPHIC DESIGN
-              </h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">
-                Clean, modern visuals that build your brand.
-              </p>
-            </div>
-          </div>
-
-          <div className="glass-card p-6 rounded-xl flex items-start gap-4 hover:border-white/30 transition-all backdrop-blur-md bg-black/40">
-            <div className="p-3 rounded-lg bg-white/10 border border-white/10 text-white shrink-0">
-              <Zap className="w-5 h-5" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                FAST TURNAROUND
-              </h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">
-                Quality work, on time. Every time.
-              </p>
-            </div>
-          </div>
+          {[
+            { icon: Clapperboard, title: 'VIDEO EDITING', desc: 'Cinematic edits that tell your story with impact.' },
+            { icon: ImageIcon, title: 'THUMBNAIL DESIGN', desc: 'High CTR thumbnails that get more clicks.' },
+            { icon: PencilRuler, title: 'GRAPHIC DESIGN', desc: 'Clean, modern visuals that build your brand.' },
+            { icon: Zap, title: 'FAST TURNAROUND', desc: 'Quality work, on time. Every time.' },
+          ].map((feature, idx) => {
+            const Icon = feature.icon;
+            return (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: idx * 0.12, ease: [0.215, 0.61, 0.355, 1] }}
+                className="glass-card p-6 rounded-2xl flex items-start gap-4 hover:border-white/30 transition-all backdrop-blur-md bg-black/40 hover:-translate-y-1 hover:shadow-2xl group"
+              >
+                <div className="p-3 rounded-xl bg-white/10 border border-white/10 text-white shrink-0 group-hover:scale-110 transition-transform">
+                  <Icon className="w-5 h-5 text-amber-400" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold text-white uppercase tracking-wider font-orbitron">
+                    {feature.title}
+                  </h3>
+                  <p className="text-xs text-neutral-400 leading-relaxed">
+                    {feature.desc}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </Container>
 
