@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from './AuthProvider';
-import { ShieldAlert, LogIn, Lock, Wrench, ShieldCheck, LogOut, Loader2, Sparkles } from 'lucide-react';
+import { ShieldAlert, LogIn, Lock, Wrench, ShieldCheck, LogOut, Loader2, Sparkles, Eye } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AnimatedVideoBackground } from '@/components/ui/AnimatedVideoBackground';
 
@@ -12,6 +12,7 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, isLoading: authLoading, loginWithDiscord, logout } = useAuth();
   const [maintenanceActive, setMaintenanceActive] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
+  const [forcePreview, setForcePreview] = useState(false);
 
   useEffect(() => {
     fetch('/api/admin/maintenance')
@@ -25,26 +26,35 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
       .finally(() => setIsChecking(false));
   }, [pathname]);
 
-  // Always allow admin routes or if maintenance mode is disabled
-  if (!isChecking && !maintenanceActive) {
-    return <>{children}</>;
-  }
-
   // Always allow /admin or API routes or auth callbacks to prevent lockout
   if (pathname.startsWith('/admin') || pathname.startsWith('/api') || pathname.startsWith('/auth')) {
     return <>{children}</>;
   }
 
-  // If user is authenticated and is Staff/Admin, bypass maintenance screen!
-  if (isAuthenticated && user?.isAdmin) {
+  // If maintenance mode is disabled AND no force preview, show website
+  if (!isChecking && !maintenanceActive && !forcePreview) {
+    return <>{children}</>;
+  }
+
+  // If user is Staff and forcePreview is false, allow bypass
+  if (!forcePreview && isAuthenticated && user?.isAdmin) {
     return (
       <>
         {/* Top Staff Bypass Indicator Banner */}
-        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-black text-[11px] font-mono font-bold py-1 px-4 text-center flex items-center justify-center gap-2 shadow-lg border-b border-amber-600">
-          <ShieldCheck className="w-4 h-4" />
-          <span>MAINTENANCE MODE AKTIV — Du hast als Discord Staff (@{user.username}) Zugriff freigeschaltet</span>
+        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-black text-[11px] font-mono font-bold py-1.5 px-4 text-center flex items-center justify-between shadow-xl border-b border-amber-600">
+          <div className="flex items-center gap-2 mx-auto">
+            <ShieldCheck className="w-4 h-4" />
+            <span>MAINTENANCE MODE AKTIV — Du hast als Discord Staff (@{user.username}) Zugriff freigeschaltet</span>
+          </div>
+          <button
+            onClick={() => setForcePreview(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-black text-amber-300 hover:text-white font-bold border border-black/30 transition-colors text-[10px] uppercase cursor-pointer"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>Vorschau-Screen Testen</span>
+          </button>
         </div>
-        <div className="pt-6">{children}</div>
+        <div className="pt-8">{children}</div>
       </>
     );
   }
@@ -58,11 +68,22 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // RENDER MAINTENANCE SCREEN FOR NON-STAFF VISITORS
+  // RENDER MAINTENANCE SCREEN FOR VISITORS & PREVIEW MODE
   return (
     <div className="min-h-screen bg-[#070709] text-white flex items-center justify-center p-4 relative overflow-hidden font-sans">
       {/* Background topography animation */}
       <AnimatedVideoBackground isFixed={true} overlayOpacity="bg-black/80" />
+
+      {/* Exit preview button if staff testing preview */}
+      {forcePreview && (
+        <button
+          onClick={() => setForcePreview(false)}
+          className="fixed top-4 right-4 z-50 px-4 py-2 rounded-xl bg-amber-500 text-black font-extrabold text-xs font-mono border border-amber-400 shadow-2xl flex items-center gap-2 cursor-pointer"
+        >
+          <Eye className="w-4 h-4" />
+          <span>VORSCHAU BEENDEN (ZURÜCK ZUR WEBSITE)</span>
+        </button>
+      )}
 
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -114,7 +135,7 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
             </p>
             <button
               onClick={() => logout()}
-              className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-white font-bold border border-red-500/40 transition-colors"
+              className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-white font-bold border border-red-500/40 transition-colors cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Abmelden / Account wechseln</span>
