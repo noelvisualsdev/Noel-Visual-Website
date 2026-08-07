@@ -23,6 +23,26 @@ export interface ProjectDocument {
 const dataDir = path.join(process.cwd(), 'data');
 const filePath = path.join(dataDir, 'projects.json');
 
+const DEFAULT_FALLBACK_IMAGE = '/images/featured_edit_city_nights.jpg';
+
+export function normalizeMediaUrl(url?: string): string {
+  if (!url || typeof url !== 'string') return DEFAULT_FALLBACK_IMAGE;
+  let trimmed = url.trim();
+  if (!trimmed) return DEFAULT_FALLBACK_IMAGE;
+
+  // If it's an expired Discord CDN attachment link, fall back to showcase image
+  if (trimmed.includes('cdn.discordapp.com/attachments/') || trimmed.includes('media.discordapp.net/attachments/')) {
+    return DEFAULT_FALLBACK_IMAGE;
+  }
+
+  // Ensure relative URLs start with a leading slash '/'
+  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('/')) {
+    return '/' + trimmed;
+  }
+
+  return trimmed;
+}
+
 function ensureProjectsFile() {
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
@@ -41,14 +61,16 @@ export async function getProjects(): Promise<ProjectDocument[]> {
       const docs = await db.collection('projects').find({}).sort({ _id: -1 }).toArray();
       if (docs && docs.length > 0) {
         return docs.map((doc) => {
-          let imageUrls: string[] = [];
+          let rawUrls: string[] = [];
           if (Array.isArray(doc.images) && doc.images.length > 0) {
-            imageUrls = doc.images.filter((u: any) => typeof u === 'string' && u.trim());
+            rawUrls = doc.images.map((u: any) => String(u).trim()).filter(Boolean);
           } else if (typeof doc.image === 'string' && doc.image.trim()) {
-            imageUrls = [doc.image.trim()];
+            rawUrls = [doc.image.trim()];
           }
 
-          const thumbnail = imageUrls[0] || '/images/featured_edit_city_nights.jpg';
+          const normalizedImages = rawUrls.map((u) => normalizeMediaUrl(u));
+          const thumbnail = normalizedImages[0] || DEFAULT_FALLBACK_IMAGE;
+          const normalizedVideo = doc.videoUrl ? normalizeMediaUrl(doc.videoUrl) : undefined;
 
           return {
             _id: doc._id.toString(),
@@ -58,8 +80,8 @@ export async function getProjects(): Promise<ProjectDocument[]> {
             title: String(doc.title || 'Untitled Project'),
             description: String(doc.description || ''),
             image: thumbnail,
-            images: imageUrls.length > 0 ? imageUrls : [thumbnail],
-            videoUrl: doc.videoUrl ? String(doc.videoUrl) : undefined,
+            images: normalizedImages.length > 0 ? normalizedImages : [thumbnail],
+            videoUrl: normalizedVideo !== DEFAULT_FALLBACK_IMAGE ? normalizedVideo : undefined,
             channelId: doc.channelId ? String(doc.channelId) : '',
             createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
             subtitle: String(doc.type || 'WORK SHOWCASE').toUpperCase(),
@@ -77,7 +99,13 @@ export async function getProjects(): Promise<ProjectDocument[]> {
   ensureProjectsFile();
   try {
     const data = fs.readFileSync(filePath, 'utf-8');
-    return JSON.parse(data);
+    const parsed: ProjectDocument[] = JSON.parse(data);
+    return parsed.map((p) => ({
+      ...p,
+      image: normalizeMediaUrl(p.image),
+      images: Array.isArray(p.images) ? p.images.map((u) => normalizeMediaUrl(u)) : [DEFAULT_FALLBACK_IMAGE],
+      videoUrl: p.videoUrl ? normalizeMediaUrl(p.videoUrl) : undefined,
+    }));
   } catch (error) {
     return [];
   }
@@ -86,16 +114,18 @@ export async function getProjects(): Promise<ProjectDocument[]> {
 export async function addProject(
   data: Omit<ProjectDocument, '_id' | 'id'>
 ): Promise<ProjectDocument> {
-  const images = data.images && data.images.length > 0 ? data.images : ['/images/featured_edit_city_nights.jpg'];
+  const rawImages = data.images && data.images.length > 0 ? data.images : [DEFAULT_FALLBACK_IMAGE];
+  const normalizedImages = rawImages.map((u) => normalizeMediaUrl(u));
+  const normalizedVideoUrl = data.videoUrl ? normalizeMediaUrl(data.videoUrl) : '';
 
   const newProject: Omit<ProjectDocument, '_id' | 'id'> = {
     type: data.type || 'work',
     clientId: data.clientId || '',
     title: data.title,
     description: data.description,
-    images: images,
-    image: images[0],
-    videoUrl: data.videoUrl || '',
+    images: normalizedImages,
+    image: normalizedImages[0],
+    videoUrl: normalizedVideoUrl !== DEFAULT_FALLBACK_IMAGE ? normalizedVideoUrl : '',
     channelId: data.channelId || '',
     createdAt: new Date().toISOString(),
   };
@@ -138,15 +168,18 @@ export async function updateProject(
   if (data.description !== undefined) updateFields.description = data.description;
 
   if (data.images && data.images.length > 0) {
-    updateFields.images = data.images;
-    updateFields.image = data.images[0];
+    const normalizedImages = data.images.map((u) => normalizeMediaUrl(u));
+    updateFields.images = normalizedImages;
+    updateFields.image = normalizedImages[0];
   } else if (data.image) {
-    updateFields.images = [data.image];
-    updateFields.image = data.image;
+    const normalizedImg = normalizeMediaUrl(data.image);
+    updateFields.images = [normalizedImg];
+    updateFields.image = normalizedImg;
   }
 
   if (data.videoUrl !== undefined) {
-    updateFields.videoUrl = data.videoUrl;
+    const normalizedVid = data.videoUrl ? normalizeMediaUrl(data.videoUrl) : '';
+    updateFields.videoUrl = normalizedVid !== DEFAULT_FALLBACK_IMAGE ? normalizedVid : '';
   }
 
   if (clientPromise) {

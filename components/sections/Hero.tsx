@@ -57,14 +57,27 @@ export const Hero = () => {
 
   const activeProject = projects[currentIndex] || projects[0];
   const allUrls = activeProject.images || [];
-  const rawImage = allUrls[0] || '';
+  const fallbackImage = '/images/featured_edit_city_nights.jpg';
+
+  const normalizeUrl = (url?: string) => {
+    if (!url) return fallbackImage;
+    let u = url.trim();
+    if (u.includes('cdn.discordapp.com/attachments/') || u.includes('media.discordapp.net/attachments/')) {
+      return fallbackImage;
+    }
+    if (!u.startsWith('http://') && !u.startsWith('https://') && !u.startsWith('/')) {
+      return '/' + u;
+    }
+    return u;
+  };
+
+  const rawImage = normalizeUrl(allUrls[0]);
 
   const isVideo = (url: string) =>
     Boolean(url && /\.(mp4|mov|webm|avi|mkv)(\?|$)/i.test(url.toLowerCase()));
 
   const showVideo = isVideo(rawImage) || isVideo(activeProject.videoUrl || '');
   const videoSrc = isVideo(rawImage) ? rawImage : (activeProject.videoUrl || '');
-  const fallbackImage = '/images/featured_edit_city_nights.jpg';
   const displayImage = heroImgError ? fallbackImage : (rawImage || fallbackImage);
 
   const handleNext = () => {

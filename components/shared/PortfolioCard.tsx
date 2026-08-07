@@ -17,13 +17,26 @@ export const PortfolioCard = ({ project, onOpenModal }: PortfolioCardProps) => {
   const [imgError, setImgError] = useState(false);
   const [videoError, setVideoError] = useState(false);
 
-  const rawImage = project.image || project.images?.[0] || '';
+  const fallbackImage = '/images/featured_edit_city_nights.jpg';
+
+  const normalizeUrl = (url?: string) => {
+    if (!url) return fallbackImage;
+    let u = url.trim();
+    if (u.includes('cdn.discordapp.com/attachments/') || u.includes('media.discordapp.net/attachments/')) {
+      return fallbackImage;
+    }
+    if (!u.startsWith('http://') && !u.startsWith('https://') && !u.startsWith('/')) {
+      return '/' + u;
+    }
+    return u;
+  };
+
+  const rawImage = normalizeUrl(project.image || project.images?.[0]);
   const isVideo = (url: string) =>
     Boolean(url && /\.(mp4|mov|webm|avi|mkv)(\?|$)/i.test(url.toLowerCase()));
 
   const showVideoPreview = isVideo(rawImage) || isVideo(project.videoUrl || '');
   const videoPreviewSrc = isVideo(rawImage) ? rawImage : (project.videoUrl || '');
-  const fallbackImage = '/images/featured_edit_city_nights.jpg';
   const displayImage = imgError ? fallbackImage : (rawImage || fallbackImage);
 
   return (
@@ -51,10 +64,8 @@ export const PortfolioCard = ({ project, onOpenModal }: PortfolioCardProps) => {
             src={displayImage}
             alt=""
             onError={(e) => {
-              const target = e.currentTarget;
-              if (!target.src.endsWith(fallbackImage)) {
-                target.src = fallbackImage;
-              }
+              setImgError(true);
+              e.currentTarget.src = fallbackImage;
             }}
             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
