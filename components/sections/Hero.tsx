@@ -97,7 +97,7 @@ export const Hero = () => {
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-wider text-white leading-[1.1] font-orbitron drop-shadow-2xl">
                 {t.hero.title1}
                 <br />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-neutral-200 to-amber-300">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-neutral-200 to-white">
                   {t.hero.title2}
                 </span>
                 <br />
@@ -135,20 +135,20 @@ export const Hero = () => {
             {/* Social Proof Bar */}
             <div className="pt-6 border-t border-white/10 space-y-3">
               <div className="flex items-center gap-2 text-[11px] font-mono text-neutral-400 tracking-wider uppercase">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <Star className="w-3.5 h-3.5 fill-white text-white" />
                 <span>TRUSTED BY TOP CREATORS & BRANDS</span>
               </div>
 
               {/* Brand Icons Row */}
               <div className="flex items-center gap-6 text-neutral-400">
                 <div className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer font-bold text-sm">
-                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> 4.9/5 RATING
+                  <Star className="w-4 h-4 text-white fill-white" /> 4.9/5 RATING
                 </div>
                 <div className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-xs font-mono">
-                  <Globe className="w-4 h-4 text-indigo-400" /> GLOBAL CLIENTS
+                  <Globe className="w-4 h-4 text-white" /> GLOBAL CLIENTS
                 </div>
                 <div className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-xs font-mono">
-                  <Flame className="w-4 h-4 text-amber-500" /> HIGH CTR
+                  <Flame className="w-4 h-4 text-white" /> HIGH CTR
                 </div>
               </div>
             </div>
@@ -311,7 +311,7 @@ export const Hero = () => {
                 className="glass-card p-6 rounded-2xl flex items-start gap-4 hover:border-white/30 transition-all backdrop-blur-md bg-black/40 hover:-translate-y-1 hover:shadow-2xl group"
               >
                 <div className="p-3 rounded-xl bg-white/10 border border-white/10 text-white shrink-0 group-hover:scale-110 transition-transform">
-                  <Icon className="w-5 h-5 text-amber-400" />
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-sm font-bold text-white uppercase tracking-wider font-orbitron">

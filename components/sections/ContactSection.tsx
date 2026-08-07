@@ -26,41 +26,41 @@ export const ContactSection = () => {
 
             <div className="space-y-6 pt-4 border-t border-white/10">
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-white/10 text-white shrink-0">
-                  <Mail className="w-5 h-5 text-amber-400" />
+                <div className="p-3 rounded-xl bg-white/10 text-white shrink-0 border border-white/15">
+                  <Mail className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <span className="text-xs font-mono uppercase text-neutral-400 block font-semibold">Direct Email Inquiry</span>
                   <a
                     href={`mailto:${SITE_CONFIG.email}`}
-                    className="text-base font-bold text-white hover:text-amber-300 hover:underline flex items-center gap-1.5 transition-colors"
+                    className="text-base font-bold text-white hover:text-neutral-300 hover:underline flex items-center gap-1.5 transition-colors"
                   >
                     {SITE_CONFIG.email}
-                    <ArrowUpRight className="w-4 h-4 text-amber-400" />
+                    <ArrowUpRight className="w-4 h-4 text-white" />
                   </a>
                 </div>
               </div>
 
               {/* Phone & WhatsApp Block */}
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-white/10 text-white shrink-0">
-                  <Phone className="w-5 h-5 text-amber-400" />
+                <div className="p-3 rounded-xl bg-white/10 text-white shrink-0 border border-white/15">
+                  <Phone className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <span className="text-xs font-mono uppercase text-neutral-400 block font-semibold">Direct Phone / WhatsApp</span>
                   <a
                     href="tel:+41782234135"
-                    className="text-base font-bold text-white hover:text-amber-300 hover:underline flex items-center gap-1.5 transition-colors"
+                    className="text-base font-bold text-white hover:text-neutral-300 hover:underline flex items-center gap-1.5 transition-colors"
                   >
                     +41 78 223 41 35
-                    <ArrowUpRight className="w-4 h-4 text-amber-400" />
+                    <ArrowUpRight className="w-4 h-4 text-white" />
                   </a>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-white/10 text-white shrink-0">
-                  <Clock className="w-5 h-5 text-amber-400" />
+                <div className="p-3 rounded-xl bg-white/10 text-white shrink-0 border border-white/15">
+                  <Clock className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <span className="text-xs font-mono uppercase text-neutral-400 block font-semibold">Response Time SLA</span>

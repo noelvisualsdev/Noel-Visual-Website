@@ -230,7 +230,7 @@ export const ReviewsSection = () => {
                       {/* Stars Rating */}
                       <div className="flex items-center gap-1">
                         {[...Array(activeReview.stars || 5)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                          <Star key={i} className="w-4 h-4 fill-white text-white" />
                         ))}
                       </div>
                     </div>
@@ -320,7 +320,7 @@ export const ReviewsSection = () => {
                         </div>
                         <div className="flex items-center">
                           {[...Array(rev.stars || 5)].map((_, i) => (
-                            <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
+                            <Star key={i} className="w-3 h-3 fill-white text-white" />
                           ))}
                         </div>
                       </div>
@@ -364,7 +364,7 @@ export const ReviewsSection = () => {
                         </div>
                         <div className="flex items-center">
                           {[...Array(rev.stars || 5)].map((_, i) => (
-                            <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
+                            <Star key={i} className="w-3 h-3 fill-white text-white" />
                           ))}
                         </div>
                       </div>

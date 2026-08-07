@@ -69,14 +69,14 @@ export const Footer = () => {
             <div className="space-y-1.5">
               <a
                 href={`mailto:${SITE_CONFIG.email}`}
-                className="inline-flex items-center gap-2 text-base md:text-lg text-amber-300 font-extrabold hover:text-amber-200 transition-colors underline underline-offset-4 decoration-amber-400 block"
+                className="inline-flex items-center gap-2 text-base md:text-lg text-white font-extrabold hover:text-neutral-300 transition-colors underline underline-offset-4 decoration-white/40 block"
               >
                 {SITE_CONFIG.email}
-                <ArrowUpRight className="w-4 h-4 text-amber-400" />
+                <ArrowUpRight className="w-4 h-4 text-white" />
               </a>
               <a
                 href="tel:+41782234135"
-                className="inline-flex items-center gap-2 text-sm text-neutral-200 font-bold hover:text-amber-300 transition-colors block"
+                className="inline-flex items-center gap-2 text-sm text-neutral-200 font-bold hover:text-white transition-colors block"
               >
                 📱 {SITE_CONFIG.phone}
               </a>
@@ -84,13 +84,13 @@ export const Footer = () => {
 
             {/* Ultra High Contrast Legal Links */}
             <div className="flex flex-wrap items-center gap-3 text-sm font-bold text-white pt-2">
-              <Link href="/impressum" className="text-white hover:text-amber-300 underline underline-offset-4 decoration-amber-400 transition-colors bg-white/10 px-3 py-1.5 rounded-lg border border-white/20">
+              <Link href="/impressum" className="text-white hover:bg-white/20 underline underline-offset-4 decoration-white/40 transition-all bg-white/10 px-3 py-1.5 rounded-lg border border-white/20">
                 Impressum
               </Link>
-              <Link href="/privacy" className="text-white hover:text-amber-300 underline underline-offset-4 decoration-amber-400 transition-colors bg-white/10 px-3 py-1.5 rounded-lg border border-white/20">
+              <Link href="/privacy" className="text-white hover:bg-white/20 underline underline-offset-4 decoration-white/40 transition-all bg-white/10 px-3 py-1.5 rounded-lg border border-white/20">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-white hover:text-amber-300 underline underline-offset-4 decoration-amber-400 transition-colors bg-white/10 px-3 py-1.5 rounded-lg border border-white/20">
+              <Link href="/terms" className="text-white hover:bg-white/20 underline underline-offset-4 decoration-white/40 transition-all bg-white/10 px-3 py-1.5 rounded-lg border border-white/20">
                 Terms of Service
               </Link>
             </div>
