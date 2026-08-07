@@ -30,6 +30,7 @@ export default function AdminOverviewPage() {
 
   // Maintenance State
   const [maintenanceActive, setMaintenanceActive] = useState(false);
+  const [showStaffBanner, setShowStaffBanner] = useState(false);
   const [isTogglingMaintenance, setIsTogglingMaintenance] = useState(false);
 
   // Announcement Banner State
@@ -46,6 +47,9 @@ export default function AdminOverviewPage() {
         if (data.success) {
           if (typeof data.maintenanceMode === 'boolean') {
             setMaintenanceActive(data.maintenanceMode);
+          }
+          if (typeof data.showStaffBanner === 'boolean') {
+            setShowStaffBanner(data.showStaffBanner);
           }
           if (typeof data.announcementText === 'string') {
             setAnnouncementText(data.announcementText);
@@ -105,6 +109,20 @@ export default function AdminOverviewPage() {
       console.error(err);
     } finally {
       setIsTogglingMaintenance(false);
+    }
+  };
+
+  const toggleStaffBanner = async () => {
+    const nextState = !showStaffBanner;
+    setShowStaffBanner(nextState);
+    try {
+      await fetch('/api/admin/maintenance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ showStaffBanner: nextState }),
+      });
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -174,27 +192,46 @@ export default function AdminOverviewPage() {
             : 'bg-gradient-to-r from-emerald-950/40 via-[#0d1812] to-[#0d0e14] border-emerald-500/40 shadow-emerald-950/20'
         }`}>
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shrink-0 shadow-lg ${
-                maintenanceActive 
-                  ? 'bg-red-500/20 border-red-500/50 text-red-400' 
-                  : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
-              }`}>
-                <Wrench className="w-6 h-6 animate-pulse" />
-              </div>
-              <div>
-                <span className="font-extrabold text-white text-base font-orbitron tracking-wide uppercase block">
-                  Wartungsmodus (Maintenance)
-                </span>
-                <span className={`text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full border uppercase inline-block mt-1 ${
-                  maintenanceActive
-                    ? 'bg-red-500/20 text-red-300 border-red-500/40'
-                    : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shrink-0 shadow-lg ${
+                  maintenanceActive 
+                    ? 'bg-red-500/20 border-red-500/50 text-red-400' 
+                    : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
                 }`}>
-                  {maintenanceActive ? '🔴 AKTIV (NUR STAFF)' : '🟢 LIVE (ÖFFENTLICH)'}
-                </span>
+                  <Wrench className="w-6 h-6 animate-pulse" />
+                </div>
+                <div>
+                  <span className="font-extrabold text-white text-base font-orbitron tracking-wide uppercase block">
+                    Wartungsmodus (Maintenance)
+                  </span>
+                  <span className={`text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full border uppercase inline-block mt-1 ${
+                    maintenanceActive
+                      ? 'bg-red-500/20 text-red-300 border-red-500/40'
+                      : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                  }`}>
+                    {maintenanceActive ? '🔴 AKTIV (NUR STAFF)' : '🟢 LIVE (ÖFFENTLICH)'}
+                  </span>
+                </div>
               </div>
+
+              {/* Staff Banner Toggle */}
+              {maintenanceActive && (
+                <button
+                  type="button"
+                  onClick={toggleStaffBanner}
+                  className={`px-3 py-1.5 rounded-full border text-[10px] font-mono font-bold uppercase transition-all cursor-pointer shrink-0 ${
+                    showStaffBanner
+                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                      : 'bg-white/5 text-neutral-400 border-white/10'
+                  }`}
+                  title="Staff Hinweis-Leiste oben ein- oder ausschalten"
+                >
+                  {showStaffBanner ? '🟢 HINWEIS BANNER AN' : '⚪ HINWEIS BANNER AUS'}
+                </button>
+              )}
             </div>
+
             <p className="text-xs text-neutral-300 leading-relaxed">
               {maintenanceActive
                 ? 'Die Website zeigt Besuchern aktuell den Wartungs-Screen. Nur angemeldete Discord Staff-Mitglieder dürfen zugreifen.'

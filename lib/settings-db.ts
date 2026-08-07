@@ -9,12 +9,14 @@ export interface GeneralSettings {
   maintenanceMode: boolean;
   announcementText: string;
   announcementEnabled: boolean;
+  showStaffBanner: boolean;
 }
 
 const DEFAULT_SETTINGS: GeneralSettings = {
   maintenanceMode: false,
   announcementText: '🎉 20% SALE AUF ALLE EDITING PAKETE! JETZT PROJEKT ANFRAGEN',
   announcementEnabled: true,
+  showStaffBanner: false,
 };
 
 function ensureSettingsFile() {
@@ -37,6 +39,7 @@ export async function getGeneralSettings(): Promise<GeneralSettings> {
           maintenanceMode: typeof doc.maintenanceMode === 'boolean' ? doc.maintenanceMode : DEFAULT_SETTINGS.maintenanceMode,
           announcementText: typeof doc.announcementText === 'string' ? doc.announcementText : DEFAULT_SETTINGS.announcementText,
           announcementEnabled: typeof doc.announcementEnabled === 'boolean' ? doc.announcementEnabled : DEFAULT_SETTINGS.announcementEnabled,
+          showStaffBanner: typeof doc.showStaffBanner === 'boolean' ? doc.showStaffBanner : DEFAULT_SETTINGS.showStaffBanner,
         };
       }
     } catch (e) {
@@ -52,6 +55,7 @@ export async function getGeneralSettings(): Promise<GeneralSettings> {
       maintenanceMode: Boolean(parsed.maintenanceMode),
       announcementText: parsed.announcementText || DEFAULT_SETTINGS.announcementText,
       announcementEnabled: typeof parsed.announcementEnabled === 'boolean' ? parsed.announcementEnabled : DEFAULT_SETTINGS.announcementEnabled,
+      showStaffBanner: typeof parsed.showStaffBanner === 'boolean' ? parsed.showStaffBanner : DEFAULT_SETTINGS.showStaffBanner,
     };
   } catch (err) {
     return DEFAULT_SETTINGS;

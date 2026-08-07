@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getGeneralSettings, updateGeneralSettings, setMaintenanceMode } from '@/lib/settings-db';
+import { getGeneralSettings, updateGeneralSettings } from '@/lib/settings-db';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -12,6 +12,7 @@ export async function GET() {
       maintenanceMode: settings.maintenanceMode,
       announcementText: settings.announcementText,
       announcementEnabled: settings.announcementEnabled,
+      showStaffBanner: settings.showStaffBanner,
     }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -32,6 +33,9 @@ export async function POST(request: Request) {
     if (typeof body.announcementEnabled === 'boolean') {
       updateData.announcementEnabled = body.announcementEnabled;
     }
+    if (typeof body.showStaffBanner === 'boolean') {
+      updateData.showStaffBanner = body.showStaffBanner;
+    }
 
     const updated = await updateGeneralSettings(updateData);
     return NextResponse.json({
@@ -39,6 +43,7 @@ export async function POST(request: Request) {
       maintenanceMode: updated.maintenanceMode,
       announcementText: updated.announcementText,
       announcementEnabled: updated.announcementEnabled,
+      showStaffBanner: updated.showStaffBanner,
     }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });

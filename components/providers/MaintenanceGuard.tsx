@@ -11,6 +11,7 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, isAuthenticated, isLoading: authLoading, loginWithDiscord, logout } = useAuth();
   const [maintenanceActive, setMaintenanceActive] = useState(false);
+  const [showStaffBanner, setShowStaffBanner] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const [forcePreview, setForcePreview] = useState(false);
 
@@ -18,8 +19,13 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
     fetch('/api/admin/maintenance')
       .then((res) => res.json())
       .then((data) => {
-        if (data.success && typeof data.maintenanceMode === 'boolean') {
-          setMaintenanceActive(data.maintenanceMode);
+        if (data.success) {
+          if (typeof data.maintenanceMode === 'boolean') {
+            setMaintenanceActive(data.maintenanceMode);
+          }
+          if (typeof data.showStaffBanner === 'boolean') {
+            setShowStaffBanner(data.showStaffBanner);
+          }
         }
       })
       .catch((err) => console.error(err))
@@ -36,25 +42,27 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  // If user is Staff and forcePreview is false, allow bypass with Top Staff Maintenance Banner
+  // If user is Staff and forcePreview is false, allow bypass!
   if (!forcePreview && isAuthenticated && user?.isAdmin) {
     return (
       <>
-        {/* Top Staff Maintenance Indicator Banner (Positioned cleanly at the very top) */}
-        <div className="bg-[#0e0f18] border-b border-white/20 text-white text-xs font-mono font-bold py-2.5 px-4 flex items-center justify-between shadow-2xl relative z-[60]">
-          <div className="flex items-center gap-2 mx-auto text-center truncate">
-            <ShieldCheck className="w-4 h-4 text-white shrink-0" />
-            <span className="truncate">MAINTENANCE MODE AKTIV — Staff Freischaltung (@{user.username})</span>
+        {/* Optional Top Staff Maintenance Indicator Banner (Only shown if showStaffBanner is true) */}
+        {showStaffBanner && (
+          <div className="bg-[#0e0f18] border-b border-white/20 text-white text-xs font-mono font-bold py-2.5 px-4 flex items-center justify-between shadow-2xl relative z-[60]">
+            <div className="flex items-center gap-2 mx-auto text-center truncate">
+              <ShieldCheck className="w-4 h-4 text-white shrink-0" />
+              <span className="truncate">MAINTENANCE MODE AKTIV — Staff Freischaltung (@{user.username})</span>
+            </div>
+            <button
+              onClick={() => setForcePreview(true)}
+              className="px-3 py-1 rounded-lg bg-white text-black hover:bg-neutral-200 font-extrabold text-[10px] uppercase transition-all cursor-pointer shrink-0 ml-2 shadow-md flex items-center gap-1"
+              title="Wartungs-Screen als Vorschau anzeigen"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>Vorschau-Screen</span>
+            </button>
           </div>
-          <button
-            onClick={() => setForcePreview(true)}
-            className="px-3 py-1 rounded-lg bg-white text-black hover:bg-neutral-200 font-extrabold text-[10px] uppercase transition-all cursor-pointer shrink-0 ml-2 shadow-md flex items-center gap-1"
-            title="Wartungs-Screen als Vorschau anzeigen"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>Vorschau-Screen</span>
-          </button>
-        </div>
+        )}
 
         {children}
       </>
