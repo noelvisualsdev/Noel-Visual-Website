@@ -66,13 +66,19 @@ export const Footer = () => {
             <h3 className="text-sm font-bold uppercase tracking-wider text-white font-orbitron border-b border-white/10 pb-2">
               KONTAKT & RECHTLICHES
             </h3>
-            <div>
+            <div className="space-y-1.5">
               <a
                 href={`mailto:${SITE_CONFIG.email}`}
-                className="inline-flex items-center gap-2 text-base md:text-lg text-amber-300 font-extrabold hover:text-amber-200 transition-colors underline underline-offset-4 decoration-amber-400"
+                className="inline-flex items-center gap-2 text-base md:text-lg text-amber-300 font-extrabold hover:text-amber-200 transition-colors underline underline-offset-4 decoration-amber-400 block"
               >
                 {SITE_CONFIG.email}
-                <ArrowUpRight className="w-5 h-5 text-amber-400" />
+                <ArrowUpRight className="w-4 h-4 text-amber-400" />
+              </a>
+              <a
+                href="tel:+41782234135"
+                className="inline-flex items-center gap-2 text-sm text-neutral-200 font-bold hover:text-amber-300 transition-colors block"
+              >
+                📱 {SITE_CONFIG.phone}
               </a>
             </div>
 

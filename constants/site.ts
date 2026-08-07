@@ -5,6 +5,7 @@ export const SITE_CONFIG = {
     'NOEL VISUALS delivers high-impact visuals that help creators and brands stand out and grow.',
   url: 'https://noelvisuals.com',
   email: 'contact.noelvisuals@gmail.com',
+  phone: '+41 78 223 41 35',
   location: 'Zurich • Los Angeles • Tokyo',
   navLinks: [
     { label: 'WORK', href: '/work' },
