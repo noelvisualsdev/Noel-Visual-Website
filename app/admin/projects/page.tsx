@@ -18,6 +18,7 @@ const fallbackImage = '/images/featured_edit_city_nights.jpg';
 const normalizeUrl = (url?: string) => {
   if (!url) return fallbackImage;
   let u = url.trim();
+  if (u.startsWith('data:')) return u;
   if (u.includes('cdn.discordapp.com/attachments/') || u.includes('media.discordapp.net/attachments/')) {
     return fallbackImage;
   }
@@ -67,13 +68,16 @@ export default function AdminProjectsPage() {
     fetchProjects();
   }, []);
 
-  // Multi-file upload for New Project / Edit Project
+  // Multi-file upload for New Project / Edit Project (Instant Base64 preview + Server Upload)
   const handleMultiFileUpload = async (files: FileList, targetSetter: React.Dispatch<React.SetStateAction<string[]>>) => {
     setIsUploadingMultiple(true);
-    const uploadedUrls: string[] = [];
+    const newMediaItems: string[] = [];
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
+
+      // 1. Try uploading to server API
+      let serverUrl = '';
       try {
         const formData = new FormData();
         formData.append('file', file);
@@ -85,14 +89,33 @@ export default function AdminProjectsPage() {
 
         const data = await res.json();
         if (data.success && data.url) {
-          uploadedUrls.push(normalizeUrl(data.url));
+          serverUrl = normalizeUrl(data.url);
         }
       } catch (err) {
-        console.error(err);
+        console.warn('[Upload] API upload warning, using Base64 fallback:', err);
+      }
+
+      if (serverUrl) {
+        newMediaItems.push(serverUrl);
+      } else {
+        // 2. Read as Base64 for 100% guaranteed instant preview
+        try {
+          const base64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+          if (base64) {
+            newMediaItems.push(base64);
+          }
+        } catch (e) {
+          console.error('[Upload] Base64 reader error:', e);
+        }
       }
     }
 
-    targetSetter((prev) => [...prev, ...uploadedUrls]);
+    targetSetter((prev) => [...prev, ...newMediaItems]);
     setIsUploadingMultiple(false);
   };
 

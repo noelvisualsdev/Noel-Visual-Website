@@ -22,6 +22,7 @@ export const PortfolioCard = ({ project, onOpenModal }: PortfolioCardProps) => {
   const normalizeUrl = (url?: string) => {
     if (!url) return fallbackImage;
     let u = url.trim();
+    if (u.startsWith('data:')) return u;
     if (u.includes('cdn.discordapp.com/attachments/') || u.includes('media.discordapp.net/attachments/')) {
       return fallbackImage;
     }

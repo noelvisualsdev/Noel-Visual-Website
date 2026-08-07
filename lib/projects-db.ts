@@ -29,6 +29,7 @@ export function normalizeMediaUrl(url?: string): string {
   if (!url || typeof url !== 'string') return DEFAULT_FALLBACK_IMAGE;
   let trimmed = url.trim();
   if (!trimmed) return DEFAULT_FALLBACK_IMAGE;
+  if (trimmed.startsWith('data:')) return trimmed;
 
   // If it's an expired Discord CDN attachment link, fall back to showcase image
   if (trimmed.includes('cdn.discordapp.com/attachments/') || trimmed.includes('media.discordapp.net/attachments/')) {
@@ -111,21 +112,31 @@ export async function getProjects(): Promise<ProjectDocument[]> {
   }
 }
 
+import { saveBase64MediaLocally } from './upload-helper';
+
+function processMediaUrl(url?: string): string {
+  if (!url) return DEFAULT_FALLBACK_IMAGE;
+  if (url.startsWith('data:')) {
+    return saveBase64MediaLocally(url);
+  }
+  return normalizeMediaUrl(url);
+}
+
 export async function addProject(
   data: Omit<ProjectDocument, '_id' | 'id'>
 ): Promise<ProjectDocument> {
   const rawImages = data.images && data.images.length > 0 ? data.images : [DEFAULT_FALLBACK_IMAGE];
-  const normalizedImages = rawImages.map((u) => normalizeMediaUrl(u));
-  const normalizedVideoUrl = data.videoUrl ? normalizeMediaUrl(data.videoUrl) : '';
+  const processedImages = rawImages.map((u) => processMediaUrl(u));
+  const processedVideoUrl = data.videoUrl ? processMediaUrl(data.videoUrl) : '';
 
   const newProject: Omit<ProjectDocument, '_id' | 'id'> = {
     type: data.type || 'work',
     clientId: data.clientId || '',
     title: data.title,
     description: data.description,
-    images: normalizedImages,
-    image: normalizedImages[0],
-    videoUrl: normalizedVideoUrl !== DEFAULT_FALLBACK_IMAGE ? normalizedVideoUrl : '',
+    images: processedImages,
+    image: processedImages[0],
+    videoUrl: processedVideoUrl !== DEFAULT_FALLBACK_IMAGE ? processedVideoUrl : '',
     channelId: data.channelId || '',
     createdAt: new Date().toISOString(),
   };
@@ -168,18 +179,18 @@ export async function updateProject(
   if (data.description !== undefined) updateFields.description = data.description;
 
   if (data.images && data.images.length > 0) {
-    const normalizedImages = data.images.map((u) => normalizeMediaUrl(u));
-    updateFields.images = normalizedImages;
-    updateFields.image = normalizedImages[0];
+    const processedImages = data.images.map((u) => processMediaUrl(u));
+    updateFields.images = processedImages;
+    updateFields.image = processedImages[0];
   } else if (data.image) {
-    const normalizedImg = normalizeMediaUrl(data.image);
-    updateFields.images = [normalizedImg];
-    updateFields.image = normalizedImg;
+    const processedImg = processMediaUrl(data.image);
+    updateFields.images = [processedImg];
+    updateFields.image = processedImg;
   }
 
   if (data.videoUrl !== undefined) {
-    const normalizedVid = data.videoUrl ? normalizeMediaUrl(data.videoUrl) : '';
-    updateFields.videoUrl = normalizedVid !== DEFAULT_FALLBACK_IMAGE ? normalizedVid : '';
+    const processedVid = data.videoUrl ? processMediaUrl(data.videoUrl) : '';
+    updateFields.videoUrl = processedVid !== DEFAULT_FALLBACK_IMAGE ? processedVid : '';
   }
 
   if (clientPromise) {
