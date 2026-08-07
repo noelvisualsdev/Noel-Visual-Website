@@ -2,7 +2,6 @@ import clientPromise from './mongodb';
 import { ObjectId } from 'mongodb';
 import fs from 'fs';
 import path from 'path';
-import { saveExternalMediaLocally } from './upload-helper';
 
 export interface ProjectDocument {
   _id?: string;
@@ -41,82 +40,15 @@ export async function getProjects(): Promise<ProjectDocument[]> {
       const db = client.db('noelvisuals');
       const docs = await db.collection('projects').find({}).sort({ _id: -1 }).toArray();
       if (docs && docs.length > 0) {
-        const DEFAULT_STUDIO_IMAGES = [
-          '/images/featured_edit_city_nights.jpg',
-          '/images/featured_edit_neon_cyber.jpg',
-          '/images/featured_edit_brand_identity.jpg',
-          '/images/featured_edit_thumbnail_art.jpg',
-          '/images/og-image.png',
-        ];
-
-        // Background Auto-Persister: Save any fresh Discord attachments to server disk & update MongoDB Atlas
-        docs.forEach((doc) => {
-          if (doc._id && Array.isArray(doc.images)) {
-            const hasDiscordUrl = doc.images.some(u => typeof u === 'string' && u.includes('cdn.discordapp.com/attachments/'));
-            if (hasDiscordUrl) {
-              Promise.all(doc.images.map(u => saveExternalMediaLocally(u))).then(async (savedImgs) => {
-                const isChanged = savedImgs.some((s, i) => s !== doc.images[i]);
-                if (isChanged) {
-                  try {
-                    const client = await clientPromise;
-                    if (client) {
-                      const db = client.db('noelvisuals');
-                      await db.collection('projects').updateOne(
-                        { _id: doc._id },
-                        { $set: { images: savedImgs, image: savedImgs[0], updatedAt: new Date() } }
-                      );
-                      console.log(`[AutoMediaSaver] Updated project "${doc.title}" in MongoDB with permanent local paths.`);
-                    }
-                  } catch (err) {
-                    console.warn('[AutoMediaSaver] MongoDB update error:', err);
-                  }
-                }
-              }).catch(() => {});
-            }
-          }
-        });
-
-        return docs.map((doc, idx) => {
-          let rawUrls: string[] = [];
-          if (Array.isArray(doc.images)) {
-            rawUrls = doc.images;
-          } else if (typeof doc.images === 'string' && doc.images.trim()) {
-            rawUrls = [doc.images.trim()];
+        return docs.map((doc) => {
+          let imageUrls: string[] = [];
+          if (Array.isArray(doc.images) && doc.images.length > 0) {
+            imageUrls = doc.images.filter((u: any) => typeof u === 'string' && u.trim());
           } else if (typeof doc.image === 'string' && doc.image.trim()) {
-            rawUrls = [doc.image.trim()];
+            imageUrls = [doc.image.trim()];
           }
 
-          // Sanitize: Expired Discord CDN attachments (ex=... links) return 403 Forbidden for external visitors.
-          // Replace expired Discord attachment links with permanent studio showcase images.
-          const sanitizeUrl = (url: string, index: number, projType: string) => {
-            if (!url) return '';
-            if (url.includes('cdn.discordapp.com/attachments/') || url.includes('media.discordapp.net/attachments/')) {
-              const lowerType = (projType || '').toLowerCase();
-              if (lowerType.includes('thumb')) return '/images/featured_edit_thumbnail_art.jpg';
-              if (lowerType.includes('brand') || lowerType.includes('design')) return '/images/featured_edit_brand_identity.jpg';
-              if (lowerType.includes('cyber') || lowerType.includes('gaming')) return '/images/featured_edit_neon_cyber.jpg';
-              return DEFAULT_STUDIO_IMAGES[index % DEFAULT_STUDIO_IMAGES.length];
-            }
-            return url;
-          };
-
-          const allUrls = rawUrls.map((u, i) => sanitizeUrl(u, idx + i, String(doc.type || '')));
-
-          // Auto-detect: separate video URLs from image URLs
-          const isVideoUrl = (url: string) =>
-            Boolean(url && /\.(mp4|mov|webm|avi|mkv)(\?|$)/i.test(url.toLowerCase()));
-
-          const imageUrls = allUrls.filter(u => u && !isVideoUrl(u));
-          const videoUrls = allUrls.filter(u => u && isVideoUrl(u));
-
-          const rawVideo = doc.videoUrl || doc.video;
-          const sanitizedVideo = rawVideo && !rawVideo.includes('cdn.discordapp.com/attachments/')
-            ? rawVideo
-            : videoUrls[0] || undefined;
-
-          // Thumbnail = first valid image OR studio fallback image
-          const fallbackImg = DEFAULT_STUDIO_IMAGES[idx % DEFAULT_STUDIO_IMAGES.length];
-          const thumbnail = imageUrls[0] || fallbackImg;
+          const thumbnail = imageUrls[0] || '/images/featured_edit_city_nights.jpg';
 
           return {
             _id: doc._id.toString(),
@@ -127,7 +59,7 @@ export async function getProjects(): Promise<ProjectDocument[]> {
             description: String(doc.description || ''),
             image: thumbnail,
             images: imageUrls.length > 0 ? imageUrls : [thumbnail],
-            videoUrl: sanitizedVideo,
+            videoUrl: doc.videoUrl ? String(doc.videoUrl) : undefined,
             channelId: doc.channelId ? String(doc.channelId) : '',
             createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : new Date().toISOString(),
             subtitle: String(doc.type || 'WORK SHOWCASE').toUpperCase(),
@@ -154,18 +86,16 @@ export async function getProjects(): Promise<ProjectDocument[]> {
 export async function addProject(
   data: Omit<ProjectDocument, '_id' | 'id'>
 ): Promise<ProjectDocument> {
-  // Automatically download temporary Discord/external media and save permanently on server
-  const rawImages = data.images && data.images.length > 0 ? data.images : ['/images/featured_edit_city_nights.jpg'];
-  const savedImages = await Promise.all(rawImages.map((img) => saveExternalMediaLocally(img)));
-  const savedVideoUrl = data.videoUrl ? await saveExternalMediaLocally(data.videoUrl) : '';
+  const images = data.images && data.images.length > 0 ? data.images : ['/images/featured_edit_city_nights.jpg'];
 
   const newProject: Omit<ProjectDocument, '_id' | 'id'> = {
     type: data.type || 'work',
     clientId: data.clientId || '',
     title: data.title,
     description: data.description,
-    images: savedImages,
-    videoUrl: savedVideoUrl,
+    images: images,
+    image: images[0],
+    videoUrl: data.videoUrl || '',
     channelId: data.channelId || '',
     createdAt: new Date().toISOString(),
   };
@@ -208,19 +138,15 @@ export async function updateProject(
   if (data.description !== undefined) updateFields.description = data.description;
 
   if (data.images && data.images.length > 0) {
-    const savedImages = await Promise.all(
-      data.images.map((img) => saveExternalMediaLocally(img))
-    );
-    updateFields.images = savedImages;
-    updateFields.image = savedImages[0];
+    updateFields.images = data.images;
+    updateFields.image = data.images[0];
   } else if (data.image) {
-    const savedImg = await saveExternalMediaLocally(data.image);
-    updateFields.images = [savedImg];
-    updateFields.image = savedImg;
+    updateFields.images = [data.image];
+    updateFields.image = data.image;
   }
 
   if (data.videoUrl !== undefined) {
-    updateFields.videoUrl = data.videoUrl ? await saveExternalMediaLocally(data.videoUrl) : '';
+    updateFields.videoUrl = data.videoUrl;
   }
 
   if (clientPromise) {
