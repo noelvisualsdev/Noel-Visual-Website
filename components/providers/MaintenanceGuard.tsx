@@ -36,33 +36,27 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  // If user is Staff and forcePreview is false, allow bypass with a clean floating bottom-right indicator
+  // If user is Staff and forcePreview is false, allow bypass with Top Staff Maintenance Banner
   if (!forcePreview && isAuthenticated && user?.isAdmin) {
     return (
       <>
-        {children}
-
-        {/* Floating Bottom-Right Staff Bypass Indicator Pill (No Navbar Collision) */}
-        <div className="fixed bottom-6 right-6 z-50 bg-[#0d0e15]/95 backdrop-blur-xl border border-amber-500/40 text-amber-300 text-xs font-mono font-bold p-3 px-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-fade-in max-w-md">
-          <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-4 h-4" />
-          </div>
-          <div className="space-y-0.5 truncate">
-            <span className="text-white font-bold block text-[11px] uppercase tracking-wider font-orbitron">
-              Wartungsmodus Aktiv
-            </span>
-            <span className="text-[10px] text-neutral-300 block truncate">
-              Staff Access (@{user.username})
-            </span>
+        {/* Top Staff Maintenance Indicator Banner (Positioned cleanly at the very top) */}
+        <div className="bg-[#0e0f18] border-b border-white/20 text-white text-xs font-mono font-bold py-2.5 px-4 flex items-center justify-between shadow-2xl relative z-[60]">
+          <div className="flex items-center gap-2 mx-auto text-center truncate">
+            <ShieldCheck className="w-4 h-4 text-white shrink-0" />
+            <span className="truncate">MAINTENANCE MODE AKTIV — Staff Freischaltung (@{user.username})</span>
           </div>
           <button
             onClick={() => setForcePreview(true)}
-            className="px-3 py-1.5 rounded-xl bg-amber-400 text-black hover:bg-amber-300 font-bold border border-amber-300 transition-all text-[10px] uppercase cursor-pointer shrink-0 ml-auto shadow-md"
+            className="px-3 py-1 rounded-lg bg-white text-black hover:bg-neutral-200 font-extrabold text-[10px] uppercase transition-all cursor-pointer shrink-0 ml-2 shadow-md flex items-center gap-1"
             title="Wartungs-Screen als Vorschau anzeigen"
           >
-            Vorschau
+            <Eye className="w-3.5 h-3.5" />
+            <span>Vorschau-Screen</span>
           </button>
         </div>
+
+        {children}
       </>
     );
   }
@@ -71,7 +65,7 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
   if (isChecking || authLoading) {
     return (
       <div className="min-h-screen bg-[#070709] flex items-center justify-center text-white">
-        <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
+        <Loader2 className="w-8 h-8 animate-spin text-white" />
       </div>
     );
   }
@@ -86,7 +80,7 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
       {forcePreview && (
         <button
           onClick={() => setForcePreview(false)}
-          className="fixed top-6 right-6 z-50 px-4 py-2.5 rounded-2xl bg-amber-400 text-black font-extrabold text-xs font-orbitron border border-amber-300 shadow-2xl flex items-center gap-2 cursor-pointer hover:scale-105 transition-all"
+          className="fixed top-6 right-6 z-[70] px-4 py-2.5 rounded-2xl bg-white text-black font-extrabold text-xs font-orbitron border border-white shadow-2xl flex items-center gap-2 cursor-pointer hover:scale-105 transition-all"
         >
           <Eye className="w-4 h-4" />
           <span>VORSCHAU BEENDEN (ZURÜCK ZUR WEBSITE)</span>
@@ -99,16 +93,16 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
         className="max-w-xl w-full bg-[#0d0e14]/90 backdrop-blur-xl border border-white/15 rounded-3xl p-8 md:p-10 space-y-8 text-center shadow-2xl relative z-10"
       >
         {/* Pulsing Wrench & Shield Icon */}
-        <div className="mx-auto w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center relative shadow-lg shadow-amber-500/10">
-          <Wrench className="w-10 h-10 text-amber-400 animate-pulse" />
-          <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-black border border-amber-400 flex items-center justify-center">
-            <Lock className="w-3.5 h-3.5 text-amber-400" />
+        <div className="mx-auto w-20 h-20 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center relative shadow-lg">
+          <Wrench className="w-10 h-10 text-white animate-pulse" />
+          <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-black border border-white flex items-center justify-center">
+            <Lock className="w-3.5 h-3.5 text-white" />
           </div>
         </div>
 
         {/* Title */}
         <div className="space-y-3">
-          <span className="px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-mono font-bold uppercase tracking-widest inline-flex items-center gap-1.5">
+          <span className="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white text-xs font-mono font-bold uppercase tracking-widest inline-flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5" />
             Wartungsarbeiten Aktiv
           </span>
@@ -123,7 +117,7 @@ export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
         {/* Discord OAuth Bypass Notice */}
         <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3 text-xs text-left font-sans">
           <div className="flex items-center gap-2 font-bold text-white uppercase tracking-wider font-orbitron text-xs">
-            <ShieldCheck className="w-4 h-4 text-amber-400" />
+            <ShieldCheck className="w-4 h-4 text-white" />
             <span>Staff / Team Login Bypass</span>
           </div>
           <p className="text-neutral-300 leading-relaxed">

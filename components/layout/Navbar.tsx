@@ -38,7 +38,7 @@ export const Navbar = () => {
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4 md:py-5',
+          'sticky top-0 left-0 right-0 z-40 transition-all duration-300 py-4 md:py-5',
           scrolled ? 'glass-nav py-3 md:py-4 shadow-2xl' : 'bg-transparent'
         )}
       >
