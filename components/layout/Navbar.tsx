@@ -84,18 +84,6 @@ export const Navbar = () => {
                 </Link>
               );
             })}
-
-            {/* Admin link if role verified */}
-            {user?.isAdmin && (
-              <Link
-                href="/admin"
-                className="text-amber-300 font-bold hover:text-amber-200 flex items-center gap-1.5 bg-amber-500/20 px-3 py-1.5 rounded-lg border border-amber-400/40 text-xs font-mono shrink-0 transition-colors"
-                title="Admin Dashboard"
-              >
-                <ShieldCheck className="w-4 h-4 text-amber-400" />
-                <span>Admin Dashboard</span>
-              </Link>
-            )}
           </nav>
 
           {/* Action Buttons & Auth */}
