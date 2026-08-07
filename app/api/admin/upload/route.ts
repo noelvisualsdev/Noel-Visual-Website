@@ -2,11 +2,30 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import { saveBase64MediaLocally } from '@/lib/upload-helper';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
+    const contentType = request.headers.get('content-type') || '';
+
+    // Handle JSON payload (Base64 uploads)
+    if (contentType.includes('application/json')) {
+      const body = await request.json();
+      const base64Data = body.base64 || body.file || body.data;
+      if (!base64Data) {
+        return NextResponse.json({ success: false, message: 'Kein Base64-Inhalt empfangen.' }, { status: 400 });
+      }
+
+      const savedUrl = saveBase64MediaLocally(base64Data);
+      return NextResponse.json({
+        success: true,
+        url: savedUrl,
+      }, { status: 200 });
+    }
+
+    // Handle Multipart FormData uploads
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
 
@@ -17,7 +36,6 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Get extension
     const originalName = file.name || 'upload.jpg';
     let ext = path.extname(originalName).toLowerCase();
     if (!ext) {

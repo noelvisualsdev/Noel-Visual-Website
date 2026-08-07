@@ -123,6 +123,31 @@ export default function AdminProjectsPage() {
     targetSetter((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Helper to ensure any Base64 preview strings are converted to short server URLs before submitting form
+  const ensureUploadedUrls = async (urls: string[]): Promise<string[]> => {
+    const processed: string[] = [];
+    for (const url of urls) {
+      if (url && url.startsWith('data:')) {
+        try {
+          const res = await fetch('/api/admin/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ base64: url }),
+          });
+          const data = await res.json();
+          if (data.success && data.url) {
+            processed.push(normalizeUrl(data.url));
+            continue;
+          }
+        } catch (err) {
+          console.error('Base64 pre-upload error:', err);
+        }
+      }
+      processed.push(normalizeUrl(url));
+    }
+    return processed;
+  };
+
   // Submit New Project Form
   const handleCreateProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,9 +161,11 @@ export default function AdminProjectsPage() {
       fullDescription = `${newDescDe.trim()}\n\n[EN]: ${newDescEn.trim()}`;
     }
 
-    const finalImages = attachedMedia.length > 0 ? attachedMedia.map(normalizeUrl) : [fallbackImage];
-
     try {
+      const rawImages = attachedMedia.length > 0 ? attachedMedia : [fallbackImage];
+      const finalImages = await ensureUploadedUrls(rawImages);
+      const finalVideoUrl = newVideoUrl.trim() ? (await ensureUploadedUrls([newVideoUrl.trim()]))[0] : '';
+
       const res = await fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -147,7 +174,7 @@ export default function AdminProjectsPage() {
           type: newType,
           description: fullDescription,
           images: finalImages,
-          videoUrl: newVideoUrl.trim() ? normalizeUrl(newVideoUrl.trim()) : '',
+          videoUrl: finalVideoUrl,
           clientId: '865289707328110662',
         }),
       });
@@ -186,6 +213,10 @@ export default function AdminProjectsPage() {
     setIsUpdating(true);
 
     try {
+      const rawImages = editImages.length > 0 ? editImages : [fallbackImage];
+      const finalImages = await ensureUploadedUrls(rawImages);
+      const finalVideoUrl = editVideoUrl ? (await ensureUploadedUrls([editVideoUrl]))[0] : '';
+
       const res = await fetch('/api/projects', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -194,8 +225,8 @@ export default function AdminProjectsPage() {
           title: editTitle,
           type: editType,
           description: editDescription,
-          images: editImages.length > 0 ? editImages.map(normalizeUrl) : [fallbackImage],
-          videoUrl: editVideoUrl ? normalizeUrl(editVideoUrl) : '',
+          images: finalImages,
+          videoUrl: finalVideoUrl,
         }),
       });
 
