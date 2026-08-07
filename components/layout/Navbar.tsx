@@ -112,7 +112,7 @@ export const Navbar = () => {
                   />
                   <span className="text-white font-semibold">@{user.username || 'User'}</span>
                   {user.isAdmin && (
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
                   )}
                 </button>
 
@@ -128,7 +128,7 @@ export const Navbar = () => {
                         <div className="font-bold text-white flex items-center justify-between">
                           <span>@{user.username || 'User'}</span>
                           {user.isAdmin && (
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 font-bold border border-amber-400/30">
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white font-bold border border-white/20">
                               ADMIN
                             </span>
                           )}
@@ -140,9 +140,9 @@ export const Navbar = () => {
                         <Link
                           href="/admin"
                           onClick={() => setAuthDropdownOpen(false)}
-                          className="flex items-center gap-2 p-2.5 rounded-lg bg-amber-400/10 border border-amber-400/30 text-amber-300 font-bold hover:bg-amber-400/20 transition-colors"
+                          className="flex items-center gap-2 p-2.5 rounded-lg bg-white/10 border border-white/20 text-white font-bold hover:bg-white/20 transition-colors font-orbitron text-xs tracking-wider"
                         >
-                          <LayoutDashboard className="w-4 h-4" />
+                          <LayoutDashboard className="w-4 h-4 text-white" />
                           <span>OPEN ADMIN DASHBOARD</span>
                         </Link>
                       )}
