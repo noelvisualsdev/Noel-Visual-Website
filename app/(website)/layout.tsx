@@ -4,6 +4,7 @@ import { Footer } from '@/components/layout/Footer';
 import { JsonLd } from '@/components/shared/JsonLd';
 import { AnimatedVideoBackground } from '@/components/ui/AnimatedVideoBackground';
 import { MaintenanceGuard } from '@/components/providers/MaintenanceGuard';
+import { AnnouncementBanner } from '@/components/layout/AnnouncementBanner';
 
 export default function WebsiteLayout({
   children,
@@ -17,6 +18,7 @@ export default function WebsiteLayout({
         <AnimatedVideoBackground isFixed={true} overlayOpacity="bg-black/80" />
         
         <JsonLd />
+        <AnnouncementBanner />
         <Navbar />
         <main className="flex-grow relative z-10">{children}</main>
         <Footer />
